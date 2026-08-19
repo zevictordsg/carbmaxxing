@@ -8,10 +8,12 @@ import type { ChannelGroup } from "@/lib/channels";
 function NavBody({
   groups,
   pathname,
+  isAdmin,
   onNavigate,
 }: {
   groups: ChannelGroup[];
   pathname: string;
+  isAdmin: boolean;
   onNavigate?: () => void;
 }) {
   return (
@@ -19,7 +21,7 @@ function NavBody({
       <Link
         href="/comunidade"
         onClick={onNavigate}
-        className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium tracking-tight mb-4 transition-colors ${
+        className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium tracking-tight mb-1 transition-colors ${
           pathname === "/comunidade"
             ? "bg-white/[0.06] text-white"
             : "text-muted hover:text-white hover:bg-white/[0.04]"
@@ -27,6 +29,21 @@ function NavBody({
       >
         Feed
       </Link>
+
+      {isAdmin && (
+        <Link
+          href="/comunidade/admin"
+          onClick={onNavigate}
+          className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium tracking-tight mb-4 transition-colors ${
+            pathname === "/comunidade/admin"
+              ? "bg-white/[0.06] text-white"
+              : "text-muted hover:text-white hover:bg-white/[0.04]"
+          }`}
+        >
+          Painel Admin
+        </Link>
+      )}
+      {!isAdmin && <div className="mb-4" />}
 
       {groups.map((group) => (
         <div key={group.category} className="mb-5">
@@ -67,10 +84,12 @@ function NavBody({
 
 export function Sidebar({
   displayName,
+  isAdmin,
   groups,
   logoutAction,
 }: {
   displayName: string;
+  isAdmin: boolean;
   groups: ChannelGroup[];
   logoutAction: () => void;
 }) {
@@ -107,6 +126,7 @@ export function Sidebar({
           <NavBody
             groups={groups}
             pathname={pathname}
+            isAdmin={isAdmin}
             onNavigate={() => setMobileOpen(false)}
           />
           <div className="border-t border-border-subtle px-3 pt-3 flex items-center justify-between">
@@ -124,7 +144,7 @@ export function Sidebar({
           <span className="heading-tight-2 text-base text-white">Carbmaxxing</span>
         </div>
 
-        <NavBody groups={groups} pathname={pathname} />
+        <NavBody groups={groups} pathname={pathname} isAdmin={isAdmin} />
 
         <div className="border-t border-border-subtle px-4 py-4 flex items-center justify-between gap-2">
           <span className="text-sm font-medium tracking-tight text-white truncate">

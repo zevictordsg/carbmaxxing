@@ -35,12 +35,12 @@ export function MessageComposer({
           name="content"
           placeholder={placeholder}
           autoComplete="off"
-          className="flex-1 rounded-md bg-white text-black placeholder:text-black/40 text-sm px-4 py-2.5 outline-none"
+          className="flex-1 rounded-md bg-surface-3 border border-border-subtle text-white placeholder:text-muted-dim text-sm px-4 py-2.5 outline-none focus:border-white/25 transition-colors"
         />
         <button
           type="submit"
           disabled={pending}
-          className="label-loose text-[10px] text-white bg-white/10 hover:bg-white/15 transition-colors rounded-md px-4 py-2.5 disabled:opacity-50 shrink-0"
+          className="label-loose text-[10px] text-white bg-white/[0.08] hover:bg-white/[0.14] transition-colors rounded-md px-4 py-2.5 disabled:opacity-50 shrink-0"
         >
           Enviar
         </button>

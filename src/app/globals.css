@@ -5,7 +5,12 @@
   --foreground: #ffffff;
   --muted: #8a8a8a;
   --muted-dim: #5c5c5c;
-  --surface: #0d0d0d;
+  --surface: #0a0a0a;
+  /* Slightly richer than --surface -- used for the comunidade chat/content
+     pane so it reads as a distinct dark layer (Discord-style depth)
+     instead of flat pure black. */
+  --surface-2: #111113;
+  --surface-3: #17171a;
   --border-subtle: #1f1f1f;
 }
 
@@ -15,6 +20,8 @@
   --color-muted: var(--muted);
   --color-muted-dim: var(--muted-dim);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
   --color-border-subtle: var(--border-subtle);
   --font-sans: var(--font-inter);
 }
