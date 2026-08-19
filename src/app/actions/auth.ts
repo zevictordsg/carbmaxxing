@@ -36,6 +36,14 @@ export async function signup(
   });
 
   if (error) {
+    // Full detail only ever goes to the server terminal -- never to the
+    // browser. If you're debugging a failed signup, this is what to look at.
+    console.error("[signup] Supabase error:", {
+      code: error.code,
+      status: error.status,
+      message: error.message,
+    });
+
     if (error.code === "user_already_exists") {
       return { message: "Já existe uma conta com esse e-mail." };
     }
@@ -80,6 +88,12 @@ export async function login(
   });
 
   if (error) {
+    console.error("[login] Supabase error:", {
+      code: error.code,
+      status: error.status,
+      message: error.message,
+    });
+
     if (error.code === "email_not_confirmed") {
       return {
         message:
