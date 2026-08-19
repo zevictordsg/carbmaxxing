@@ -1,4 +1,4 @@
--- Carbomaxxing — initial schema
+-- Carbmaxxing — initial schema
 -- Run this once against a fresh Supabase project (SQL Editor, or `supabase db push`).
 -- Fase 1 only wires up `profiles` in the app; the rest of the tables exist now
 -- so Fase 2 (comunidade) and Fase 3 (checkout) can build directly on top.

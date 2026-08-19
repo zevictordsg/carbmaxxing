@@ -13,8 +13,8 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Carbomaxxing",
-  description: "Comunidade Carbomaxxing — by zevictor.gym",
+  title: "Carbmaxxing",
+  description: "Comunidade Carbmaxxing — by zevictor.gym",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

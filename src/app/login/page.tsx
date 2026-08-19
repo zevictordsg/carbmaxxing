@@ -3,7 +3,7 @@ import Link from "next/link";
 import { LoginForm } from "@/components/auth/login-form";
 
 export const metadata: Metadata = {
-  title: "Entrar — Carbomaxxing",
+  title: "Entrar — Carbmaxxing",
 };
 
 export default function LoginPage() {
@@ -11,7 +11,7 @@ export default function LoginPage() {
     <main className="flex-1 flex flex-col items-center justify-center px-6 py-24">
       <div className="w-full max-w-sm flex flex-col items-center">
         <Link href="/" className="heading-tight-2 text-xl mb-1">
-          Carbomaxxing<span className="align-super text-[10px]">®</span>
+          Carbmaxxing<span className="align-super text-[10px]">®</span>
         </Link>
         <p className="label-loose text-[10px] text-muted-dim mb-10">
           by zevictor.gym
