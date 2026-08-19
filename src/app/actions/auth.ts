@@ -27,7 +27,7 @@ export async function signup(
 
   // profiles.display_name is populated by the handle_new_user trigger
   // (see supabase/migrations/0001_init.sql) from this metadata.
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -40,6 +40,19 @@ export async function signup(
       return { message: "Já existe uma conta com esse e-mail." };
     }
     return { message: "Não foi possível criar sua conta. Tente novamente." };
+  }
+
+  // If the Supabase project has "Confirm email" turned on (the default),
+  // signUp() creates the user but returns no session until they click the
+  // confirmation link -- redirecting to a protected route here would just
+  // bounce them straight to /login. Show a "check your inbox" message
+  // instead. With confirmation OFF, a session comes back immediately and
+  // we send them straight in.
+  if (!data.session) {
+    return {
+      message:
+        "Conta criada! Confirme seu e-mail (a gente mandou um link) antes de entrar.",
+    };
   }
 
   redirect("/comunidade");
@@ -67,6 +80,12 @@ export async function login(
   });
 
   if (error) {
+    if (error.code === "email_not_confirmed") {
+      return {
+        message:
+          "Confirme seu e-mail antes de entrar (a gente mandou um link na hora do cadastro).",
+      };
+    }
     return { message: "E-mail ou senha incorretos." };
   }
 
