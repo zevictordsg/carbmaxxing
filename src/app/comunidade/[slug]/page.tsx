@@ -5,6 +5,7 @@ import {
   type MessageWithAuthor,
 } from "@/components/community/message-list";
 import { MessageComposer } from "@/components/community/message-composer";
+import { ContentCard } from "@/components/community/content-card";
 
 // Hardcoded editorial copy for the two purely-static "inicio" channels.
 // "avisos" (also "inicio") is data-driven instead -- see the message-backed
@@ -57,6 +58,12 @@ export default async function ChannelPage({
   const isAdmin = profile?.is_admin ?? false;
 
   if (channel.category === "conteudo") {
+    const { data: items } = await supabase
+      .from("content_items")
+      .select("id, title, description, is_locked")
+      .eq("channel_id", channel.id)
+      .order("order", { ascending: true });
+
     return (
       <div className="px-6 py-10 md:px-10 md:py-12">
         <p className="label-loose text-[10px] text-muted-dim mb-2">Conteúdo</p>
@@ -64,9 +71,23 @@ export default async function ChannelPage({
         {channel.description && (
           <p className="text-muted max-w-md text-sm mb-10">{channel.description}</p>
         )}
-        <div className="rounded-xl border border-border-subtle bg-surface px-6 py-10 text-center">
-          <p className="text-sm text-muted-dim">Conteúdo chega em breve.</p>
-        </div>
+
+        {items && items.length > 0 ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {items.map((item) => (
+              <ContentCard
+                key={item.id}
+                title={item.title}
+                description={item.description}
+                isLocked={item.is_locked}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border border-border-subtle bg-surface px-6 py-10 text-center">
+            <p className="text-sm text-muted-dim">Conteúdo chega em breve.</p>
+          </div>
+        )}
       </div>
     );
   }
