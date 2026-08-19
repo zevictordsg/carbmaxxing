@@ -20,6 +20,7 @@ function LinkCard({
   external,
   className = "",
   style,
+  animationDelay,
   icon,
   title,
   subtitle,
@@ -30,6 +31,7 @@ function LinkCard({
   external?: boolean;
   className?: string;
   style?: React.CSSProperties;
+  animationDelay?: string;
   icon: React.ReactNode;
   title: string;
   subtitle: string;
@@ -41,8 +43,8 @@ function LinkCard({
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      style={style}
-      className={`relative flex items-center gap-4 w-full h-[72px] rounded-xl px-5 ${className}`}
+      style={{ ...style, animationDelay }}
+      className={`animate-fade-up relative flex items-center gap-4 w-full h-[72px] rounded-xl px-5 ${className}`}
     >
       <div className="shrink-0">{icon}</div>
       <div className="flex flex-col gap-0.5">
@@ -75,12 +77,13 @@ export function MobileLinkBio() {
           alt="Carbmaxxing"
           width={22}
           height={19}
+          className="animate-fade-up"
         />
       </div>
 
       <div className="relative z-10 flex-1 flex flex-col items-center justify-end w-full px-6 pb-10 pt-40">
-        <div className="flex flex-col items-center gap-1.5 mb-8 text-center">
-          <h1 className="heading-tight-2 text-xl text-white">
+        <div className="flex flex-col items-center gap-1.5 mb-8 text-center animate-fade-up">
+          <h1 className="heading-tight-2 text-lg text-white">
             Tudo o que você precisa
           </h1>
           <p className="text-xs text-white/60">
@@ -91,6 +94,7 @@ export function MobileLinkBio() {
         <div className="flex flex-col gap-4 w-full max-w-sm">
           <LinkCard
             href="/cadastro"
+            animationDelay="120ms"
             className="bg-black border border-white/[0.07]"
             icon={
               <div className="relative w-11 h-11 -rotate-[5deg] rounded-md overflow-hidden shadow-lg">
@@ -109,6 +113,7 @@ export function MobileLinkBio() {
           <LinkCard
             href={AURALAB_URL}
             external
+            animationDelay="220ms"
             className="border border-white/20"
             style={{
               backgroundImage:
@@ -131,6 +136,7 @@ export function MobileLinkBio() {
           <LinkCard
             href={TIKTOK_URL}
             external
+            animationDelay="320ms"
             className="bg-[#f0f0f0] border border-white/[0.07]"
             icon={
               <div className="relative w-9 h-11 rotate-[4deg]">
@@ -149,7 +155,10 @@ export function MobileLinkBio() {
           />
         </div>
 
-        <p className="mt-10 text-[11px] text-white/20 tracking-tight">
+        <p
+          className="animate-fade-up mt-10 text-[11px] text-white/20 tracking-tight"
+          style={{ animationDelay: "420ms" }}
+        >
           zevictordsg
         </p>
       </div>

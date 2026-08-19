@@ -23,17 +23,21 @@ export function DesktopHero() {
       <div className="absolute inset-0 bg-black/25" />
 
       <div className="relative z-10 flex flex-col items-center px-6">
-        <h1 className="heading-tight text-5xl lg:text-6xl xl:text-[64px] text-white flex items-start">
+        <h1 className="animate-fade-up heading-tight text-4xl lg:text-5xl xl:text-[52px] text-white flex items-start">
           Carbmaxxing
-          <span className="text-2xl lg:text-3xl ml-1 mt-1">®</span>
+          <span className="text-xl lg:text-2xl ml-1 mt-1">®</span>
         </h1>
-        <p className="mt-2 text-white/60 text-lg lg:text-xl tracking-tight">
+        <p
+          className="animate-fade-up mt-2 text-white/60 text-base lg:text-lg font-semibold tracking-tight"
+          style={{ animationDelay: "120ms" }}
+        >
           by zevictor.gym
         </p>
 
         <Link
           href="/cadastro"
-          className="mt-10 inline-flex items-center justify-center rounded-full bg-white text-black px-8 py-4 text-base font-semibold tracking-tight hover:opacity-90 transition-opacity"
+          style={{ animationDelay: "240ms" }}
+          className="animate-fade-up mt-10 inline-flex items-center justify-center rounded-full bg-white text-black px-8 py-4 text-base font-semibold tracking-tight hover:opacity-90 transition-opacity"
         >
           Entrar agora na Comunidade
         </Link>
