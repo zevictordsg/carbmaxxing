@@ -83,3 +83,14 @@ body {
     animation: none;
   }
 }
+
+/* Horizontal content carousels (Meus conteúdos) -- native scroll, no
+   visible scrollbar, cards snap into place. */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

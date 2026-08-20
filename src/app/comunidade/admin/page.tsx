@@ -45,8 +45,10 @@ export default async function AdminPage() {
 
   return (
     <div className="px-6 py-10 md:px-10 md:py-12">
-      <p className="label-loose text-[10px] text-muted-dim mb-2">Admin</p>
-      <h1 className="heading-tight-2 text-2xl text-white mb-1">Membros</h1>
+      <p className="label-loose text-[10px] text-muted-dim mb-2">🛠️ Admin</p>
+      <h1 className="heading-tight-2 text-2xl text-white mb-1 flex items-center gap-2">
+        <span aria-hidden>👥</span> Membros
+      </h1>
       <p className="text-muted text-sm mb-8">
         {profiles?.length ?? 0} pessoas na comunidade.
       </p>

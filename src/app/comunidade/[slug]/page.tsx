@@ -6,25 +6,66 @@ import {
 } from "@/components/community/message-list";
 import { MessageComposer } from "@/components/community/message-composer";
 import { ContentCard } from "@/components/community/content-card";
+import { channelEmoji } from "@/lib/channels";
+
+type StaticStep = { icon: string; title: string; description: string };
+type StaticPage = { icon: string; title: string; steps: StaticStep[] };
 
 // Hardcoded editorial copy for the two purely-static "inicio" channels.
 // "avisos" (also "inicio") is data-driven instead -- see the message-backed
 // branch below.
-const STATIC_COPY: Record<string, { title: string; body: string[] }> = {
+const STATIC_COPY: Record<string, StaticPage> = {
   "bem-vindo": {
+    icon: "👋",
     title: "Bem-vindo(a) ao Carbmaxxing",
-    body: [
-      "Você agora faz parte da comunidade. Aqui você encontra treinos, refeições e gente comprometida com o mesmo objetivo que você.",
-      "Comece se apresentando no canal Apresente-se e dando uma olhada nas Regras antes de postar.",
+    steps: [
+      {
+        icon: "🙋",
+        title: "Se apresente",
+        description: "Vá no canal Apresente-se e diga oi pra galera.",
+      },
+      {
+        icon: "📜",
+        title: "Leia as regras",
+        description: "Rapidinho, mas importante — é ali no canal Regras.",
+      },
+      {
+        icon: "📚",
+        title: "Explore o conteúdo",
+        description: "Receitas, treinos e dúvidas frequentes na categoria Conteúdo.",
+      },
+      {
+        icon: "💬",
+        title: "Participe do chat",
+        description: "O Chat Geral é o coração da comunidade — bora trocar ideia.",
+      },
     ],
   },
   regras: {
+    icon: "📜",
     title: "Regras da comunidade",
-    body: [
-      "Respeite todo mundo — sem exceções.",
-      "Sem spam, sem autopromoção fora do combinado.",
-      "Compartilhe refeições e treinos reais — essa comunidade é sobre consistência, não perfeição.",
-      "Dúvidas ou problemas? Fale com um admin.",
+    steps: [
+      {
+        icon: "🤝",
+        title: "Respeite todo mundo",
+        description: "Sem exceções.",
+      },
+      {
+        icon: "🚫",
+        title: "Sem spam",
+        description: "Nem autopromoção fora do combinado.",
+      },
+      {
+        icon: "📸",
+        title: "Poste de verdade",
+        description:
+          "Refeições e treinos reais — essa comunidade é sobre consistência, não perfeição.",
+      },
+      {
+        icon: "🆘",
+        title: "Precisa de ajuda?",
+        description: "Fale com um admin.",
+      },
     ],
   },
 };
@@ -56,29 +97,32 @@ export default async function ChannelPage({
   if (!channel) notFound();
 
   const isAdmin = profile?.is_admin ?? false;
+  const emoji = channelEmoji(channel.slug);
 
   if (channel.category === "conteudo") {
     const { data: items } = await supabase
       .from("content_items")
-      .select("id, title, description, is_locked")
+      .select("id, title, is_locked")
       .eq("channel_id", channel.id)
       .order("order", { ascending: true });
 
     return (
       <div className="px-6 py-10 md:px-10 md:py-12">
-        <p className="label-loose text-[10px] text-muted-dim mb-2">Conteúdo</p>
-        <h1 className="heading-tight-2 text-2xl text-white mb-2">{channel.name}</h1>
+        <p className="label-loose text-[10px] text-muted-dim mb-2">📚 Conteúdo</p>
+        <h1 className="heading-tight-2 text-2xl text-white mb-2 flex items-center gap-2">
+          <span aria-hidden>{emoji}</span> {channel.name}
+        </h1>
         {channel.description && (
           <p className="text-muted max-w-md text-sm mb-10">{channel.description}</p>
         )}
 
         {items && items.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {items.map((item) => (
               <ContentCard
                 key={item.id}
+                categoryLabel={channel.name}
                 title={item.title}
-                description={item.description}
                 isLocked={item.is_locked}
               />
             ))}
@@ -96,13 +140,28 @@ export default async function ChannelPage({
     const copy = STATIC_COPY[channel.slug];
     return (
       <div className="px-6 py-10 md:px-10 md:py-12 max-w-2xl">
-        <p className="label-loose text-[10px] text-muted-dim mb-2">Início</p>
-        <h1 className="heading-tight-2 text-2xl text-white mb-6">{copy.title}</h1>
-        <div className="flex flex-col gap-4">
-          {copy.body.map((paragraph, i) => (
-            <p key={i} className="text-sm text-muted leading-relaxed">
-              {paragraph}
-            </p>
+        <p className="label-loose text-[10px] text-muted-dim mb-2">🏠 Início</p>
+        <h1 className="heading-tight-2 text-2xl text-white mb-6 flex items-center gap-2">
+          <span aria-hidden>{copy.icon}</span> {copy.title}
+        </h1>
+        <div className="flex flex-col gap-3">
+          {copy.steps.map((step, i) => (
+            <div
+              key={i}
+              className="flex items-start gap-4 rounded-xl border border-border-subtle bg-surface px-5 py-4"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/[0.06] text-base" aria-hidden>
+                {step.icon}
+              </span>
+              <div>
+                <p className="text-sm font-semibold tracking-tight text-white">
+                  {step.title}
+                </p>
+                <p className="mt-0.5 text-sm text-muted-dim leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -139,7 +198,9 @@ export default async function ChannelPage({
   return (
     <div className="flex flex-col h-screen">
       <div className="border-b border-border-subtle px-4 py-4 md:px-6">
-        <h1 className="heading-tight-2 text-lg text-white">{channel.name}</h1>
+        <h1 className="heading-tight-2 text-lg text-white flex items-center gap-2">
+          <span aria-hidden>{emoji}</span> {channel.name}
+        </h1>
         {channel.description && (
           <p className="text-xs text-muted-dim mt-0.5">{channel.description}</p>
         )}
@@ -161,7 +222,7 @@ export default async function ChannelPage({
         />
       ) : (
         <div className="border-t border-border-subtle px-4 py-3 md:px-6">
-          <p className="text-xs text-muted-dim">Só admins podem postar neste canal.</p>
+          <p className="text-xs text-muted-dim">🔒 Só admins podem postar neste canal.</p>
         </div>
       )}
     </div>

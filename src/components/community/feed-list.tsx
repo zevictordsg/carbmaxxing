@@ -84,7 +84,7 @@ export function FeedList({
           className="rounded-xl border border-border-subtle bg-surface px-5 py-4"
         >
           <div className="flex items-baseline gap-2 mb-1.5">
-            <span className="label-loose text-[9px] text-muted-dim">Aviso</span>
+            <span className="label-loose text-[9px] text-muted-dim">📌 Aviso</span>
             <span className="text-[11px] text-muted-dim">
               {new Date(message.created_at).toLocaleDateString("pt-BR", {
                 day: "2-digit",

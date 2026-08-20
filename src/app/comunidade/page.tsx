@@ -9,14 +9,14 @@ import type { MessageWithAuthor } from "@/components/community/message-list";
 type FeaturedContentItem = {
   id: string;
   title: string;
-  description: string | null;
   is_locked: boolean;
   channel_slug: string;
+  channel_name: string;
 };
 
 /**
- * Root of /comunidade — the member home. Welcome banner, a "Meus
- * Conteúdos" preview row pulled from content_items (the paid-material
+ * Root of /comunidade — the member home. Full-bleed welcome banner, a
+ * "Meus Conteúdos" carousel pulled from content_items (the paid-material
  * library — see supabase/migrations/0003_content_items.sql), then the
  * pinned Avisos feed. Auth + the sidebar shell live in layout.tsx.
  */
@@ -37,9 +37,9 @@ export default async function ComunidadePage() {
       supabase.from("profiles").select("is_admin").eq("id", user.id).single(),
       supabase
         .from("content_items")
-        .select("id, title, description, is_locked, created_at, channels(slug)")
+        .select("id, title, is_locked, created_at, channels(slug, name)")
         .order("created_at", { ascending: false })
-        .limit(8),
+        .limit(10),
     ]);
 
   const isAdmin = profile?.is_admin ?? false;
@@ -49,13 +49,13 @@ export default async function ComunidadePage() {
       const channelRow = Array.isArray(item.channels)
         ? item.channels[0]
         : item.channels;
+      const c = channelRow as { slug: string; name: string } | null | undefined;
       return {
         id: item.id,
         title: item.title,
-        description: item.description,
         is_locked: item.is_locked,
-        channel_slug:
-          (channelRow as { slug: string } | null | undefined)?.slug ?? "",
+        channel_slug: c?.slug ?? "",
+        channel_name: c?.name ?? "Conteúdo",
       };
     }
   );
@@ -84,48 +84,55 @@ export default async function ComunidadePage() {
   }
 
   return (
-    <div className="px-6 py-10 md:px-10 md:py-12 max-w-5xl">
+    <div className="flex flex-col">
       <MemberBanner />
 
-      {featuredContent.length > 0 && (
-        <section className="mt-10">
-          <div className="mb-4 flex items-baseline justify-between">
-            <h2 className="heading-tight-2 text-lg text-white">Meus conteúdos</h2>
-            <Link
-              href="/comunidade/receitas"
-              className="text-xs text-muted-dim transition-colors hover:text-white"
-            >
-              Ver tudo
-            </Link>
-          </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {featuredContent.map((item) => (
-              <ContentCard
-                key={item.id}
-                href={item.channel_slug ? `/comunidade/${item.channel_slug}` : undefined}
-                title={item.title}
-                description={item.description}
-                isLocked={item.is_locked}
-              />
-            ))}
-          </div>
+      <div className="px-6 py-10 md:px-10 md:py-12 max-w-5xl">
+        {featuredContent.length > 0 && (
+          <section>
+            <div className="mb-4 flex items-baseline justify-between">
+              <h2 className="heading-tight-2 text-lg text-white flex items-center gap-2">
+                <span aria-hidden>📚</span> Meus conteúdos
+              </h2>
+              <Link
+                href="/comunidade/receitas"
+                className="text-xs text-muted-dim transition-colors hover:text-white"
+              >
+                Ver tudo →
+              </Link>
+            </div>
+            <div className="scrollbar-hide -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 md:-mx-10 md:px-10">
+              {featuredContent.map((item) => (
+                <ContentCard
+                  key={item.id}
+                  href={item.channel_slug ? `/comunidade/${item.channel_slug}` : undefined}
+                  categoryLabel={item.channel_name}
+                  title={item.title}
+                  isLocked={item.is_locked}
+                  className="w-[190px] shrink-0 snap-start sm:w-[220px]"
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section className="mt-12 max-w-2xl">
+          <p className="label-loose text-[10px] text-muted-dim mb-2 flex items-center gap-1.5">
+            <span aria-hidden>📌</span> Feed
+          </p>
+          <h2 className="heading-tight-2 text-xl text-white mb-6">Avisos fixados</h2>
+
+          {avisos && (
+            <FeedList key={avisos.id} channelId={avisos.id} initialMessages={initialMessages} />
+          )}
+
+          {avisos && isAdmin && (
+            <div className="mt-6 overflow-hidden rounded-xl border border-border-subtle">
+              <MessageComposer channelId={avisos.id} placeholder="Publicar um aviso..." />
+            </div>
+          )}
         </section>
-      )}
-
-      <section className="mt-12 max-w-2xl">
-        <p className="label-loose text-[10px] text-muted-dim mb-2">Feed</p>
-        <h2 className="heading-tight-2 text-xl text-white mb-6">Avisos fixados</h2>
-
-        {avisos && (
-          <FeedList key={avisos.id} channelId={avisos.id} initialMessages={initialMessages} />
-        )}
-
-        {avisos && isAdmin && (
-          <div className="mt-6 overflow-hidden rounded-xl border border-border-subtle">
-            <MessageComposer channelId={avisos.id} placeholder="Publicar um aviso..." />
-          </div>
-        )}
-      </section>
+      </div>
     </div>
   );
 }

@@ -3,66 +3,65 @@ import { CoverPlaceholder } from "@/components/cover-placeholder";
 import { LockIcon } from "@/components/icons/lock-icon";
 
 function CardInner({
+  categoryLabel,
   title,
-  description,
   isLocked,
 }: {
+  categoryLabel: string;
   title: string;
-  description?: string | null;
   isLocked: boolean;
 }) {
   return (
-    <>
-      <CoverPlaceholder className="aspect-[4/3] rounded-xl">
-        {isLocked && (
-          <div className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 backdrop-blur-sm">
-            <LockIcon className="h-3.5 w-3.5 text-white" />
-          </div>
-        )}
-      </CoverPlaceholder>
-      <div className="mt-3">
-        <p className="text-sm font-semibold tracking-tight text-white leading-tight">
+    <CoverPlaceholder className="aspect-[3/4] w-full rounded-xl">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+
+      {isLocked && (
+        <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 backdrop-blur-sm">
+          <LockIcon className="h-3.5 w-3.5 text-white" />
+        </div>
+      )}
+
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <p className="label-loose text-[10px] text-white/60">[{categoryLabel}]</p>
+        <p className="heading-tight-2 text-lg text-white leading-tight mt-0.5">
           {title}
         </p>
-        {description && (
-          <p className="mt-1 text-xs text-muted-dim leading-relaxed line-clamp-2">
-            {description}
-          </p>
-        )}
       </div>
-    </>
+    </CoverPlaceholder>
   );
 }
 
 /**
- * Rounded content card with a desaturated cover placeholder + lock icon for
- * gated material (per the original brief's "rounded content cards with lock
- * icons"). Renders as a Link when `href` is given (e.g. the Feed's featured
- * row pointing into a content channel); plain otherwise, for use inside the
- * channel grid it already lives on.
+ * Full-bleed portrait content card styled after the Balaclava reference:
+ * desaturated cover photo, bracketed category tag + bold title overlaid at
+ * the bottom, lock icon top-right for gated material. Renders as a Link
+ * when `href` is given (the Feed's carousel, pointing into a content
+ * channel); plain otherwise, for the channel's own full grid.
  */
 export function ContentCard({
   href,
+  categoryLabel,
   title,
-  description,
   isLocked,
+  className = "",
 }: {
   href?: string;
+  categoryLabel: string;
   title: string;
-  description?: string | null;
   isLocked: boolean;
+  className?: string;
 }) {
   if (href) {
     return (
-      <Link href={href} className="group flex flex-col">
-        <CardInner title={title} description={description} isLocked={isLocked} />
+      <Link href={href} className={`group block ${className}`}>
+        <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} />
       </Link>
     );
   }
 
   return (
-    <div className="flex flex-col">
-      <CardInner title={title} description={description} isLocked={isLocked} />
+    <div className={className}>
+      <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} />
     </div>
   );
 }

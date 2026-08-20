@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ChannelGroup } from "@/lib/channels";
+import { CATEGORY_EMOJI, channelEmoji, type ChannelGroup } from "@/lib/channels";
 
 function NavBody({
   groups,
@@ -27,7 +27,7 @@ function NavBody({
             : "text-muted hover:text-white hover:bg-white/[0.04]"
         }`}
       >
-        Feed
+        <span aria-hidden>🔥</span> Feed
       </Link>
 
       {isAdmin && (
@@ -40,14 +40,15 @@ function NavBody({
               : "text-muted hover:text-white hover:bg-white/[0.04]"
           }`}
         >
-          Painel Admin
+          <span aria-hidden>🛠️</span> Painel Admin
         </Link>
       )}
       {!isAdmin && <div className="mb-4" />}
 
       {groups.map((group) => (
         <div key={group.category} className="mb-5">
-          <p className="label-loose text-[10px] text-muted-dim px-3 mb-1.5">
+          <p className="label-loose text-[10px] text-muted-dim px-3 mb-1.5 flex items-center gap-1.5">
+            <span aria-hidden>{CATEGORY_EMOJI[group.category] ?? "•"}</span>
             {group.label}
           </p>
           <ul className="flex flex-col gap-0.5">
@@ -65,7 +66,10 @@ function NavBody({
                         : "text-muted hover:text-white hover:bg-white/[0.04]"
                     }`}
                   >
-                    <span className="truncate">{channel.name}</span>
+                    <span className="flex items-center gap-2 truncate">
+                      <span aria-hidden>{channelEmoji(channel.slug)}</span>
+                      <span className="truncate">{channel.name}</span>
+                    </span>
                     {channel.admin_only_posting && (
                       <span className="label-loose text-[8px] text-muted-dim shrink-0">
                         Admin
@@ -100,9 +104,9 @@ export function Sidebar({
     <form action={logoutAction}>
       <button
         type="submit"
-        className="label-loose text-[10px] text-muted-dim hover:text-white transition-colors"
+        className="label-loose text-[10px] text-muted-dim hover:text-white transition-colors flex items-center gap-1"
       >
-        Sair
+        <span aria-hidden>🚪</span> Sair
       </button>
     </form>
   );
