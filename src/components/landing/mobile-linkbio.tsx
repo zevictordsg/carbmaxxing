@@ -93,10 +93,14 @@ function LinkCard({
       className={`animate-fade-up group relative flex items-center gap-4 w-full h-[72px] overflow-hidden rounded-xl px-5 transition-transform duration-200 ease-out hover:scale-[1.015] active:scale-[0.97] ${className}`}
     >
       {/* Grunge texture overlay -- centered (not tiled from the corner) so
-          the pattern reads as a single centered motif on each card. */}
+          the pattern reads as a single centered motif on each card. Overscan
+          a few px past the card's own edges (rather than sitting flush at
+          inset-0) so any softness/margin baked into the source asset gets
+          clipped away by the card's overflow-hidden instead of showing up
+          as a thin untextured border. */}
       <div
         aria-hidden
-        className={`pointer-events-none absolute inset-0 transition-opacity duration-200 ${
+        className={`pointer-events-none absolute -inset-2 transition-opacity duration-200 ${
           textureOpacity === "high"
             ? "opacity-70 group-hover:opacity-90"
             : "opacity-35 group-hover:opacity-50"
