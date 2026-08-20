@@ -7,12 +7,10 @@ import Link from "next/link";
  *
  * Image drops (see /public/images/landing/README.md):
  *   mobile-hero.webp, icon-community.webp, icon-auralab.webp,
- *   icon-tiktok.webp, logo-mark.svg, card-texture.png
+ *   icon-tiktok.webp, logo-mark.svg, card-texture.png, tiktok-texture.png
  *
- * NOTE: "Baixe o Auralab" points at a placeholder "#" href until you give
- * me the real app/website link -- swap AURALAB_URL below once you have it.
  */
-const AURALAB_URL = "#";
+const AURALAB_URL = "https://apps.apple.com/br/app/auralab/id6794130003";
 const TIKTOK_URL = "https://www.tiktok.com/@zevictor.gym";
 
 function LinkCard({
@@ -38,6 +36,14 @@ function LinkCard({
   // Per-card texture override -- the TikTok card uses its own artwork
   // instead of the shared grunge pattern.
   textureSrc = "/images/landing/card-texture.png",
+  // "cover" scales the texture to fill the card's full interior edge to
+  // edge (default -- avoids the patchy look of a small tile repeating only
+  // once or twice across a wide card). "tile" repeats a small swatch
+  // instead, for textures meant to read as a repeating pattern.
+  textureFit = "cover",
+  // "high" is the bold default used on the community/auralab cards; the
+  // TikTok card dials it down to "low" so its texture stays a subtle hint.
+  textureOpacity = "high",
 }: {
   href: string;
   external?: boolean;
@@ -50,8 +56,10 @@ function LinkCard({
   subtitle: string;
   titleClassName?: string;
   subtitleClassName?: string;
-  textureBlend?: "overlay" | "screen";
+  textureBlend?: "overlay" | "screen" | "multiply" | "normal";
   textureSrc?: string;
+  textureFit?: "tile" | "cover";
+  textureOpacity?: "high" | "low";
 }) {
   const textBlock = (
     <div className="relative flex flex-1 flex-col items-center gap-0.5 text-center">
@@ -88,12 +96,16 @@ function LinkCard({
           the pattern reads as a single centered motif on each card. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-200 group-hover:opacity-90"
+        className={`pointer-events-none absolute inset-0 transition-opacity duration-200 ${
+          textureOpacity === "high"
+            ? "opacity-70 group-hover:opacity-90"
+            : "opacity-35 group-hover:opacity-50"
+        }`}
         style={{
           backgroundImage: `url(${textureSrc})`,
-          backgroundRepeat: "repeat",
+          backgroundRepeat: textureFit === "tile" ? "repeat" : "no-repeat",
           backgroundPosition: "center",
-          backgroundSize: "220px auto",
+          backgroundSize: textureFit === "tile" ? "220px auto" : "cover",
           mixBlendMode: textureBlend,
         }}
       />
@@ -199,10 +211,9 @@ export function MobileLinkBio() {
             external
             animationDelay="320ms"
             className="bg-[#f0f0f0] border border-white/[0.07]"
-            // TODO: swap for /images/landing/tiktok-texture.png once you send
-            // me "Group 1171276566.png" -- using the shared grunge texture
-            // as a placeholder until then.
-            textureBlend="overlay"
+            textureSrc="/images/landing/tiktok-texture.png"
+            textureBlend="normal"
+            textureOpacity="low"
             icon={
               <div className="relative w-[90px] h-[102px] rotate-[5deg] drop-shadow-lg">
                 <Image
