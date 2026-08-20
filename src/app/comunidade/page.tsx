@@ -4,6 +4,8 @@ import { FeedList } from "@/components/community/feed-list";
 import { MessageComposer } from "@/components/community/message-composer";
 import { MemberBanner } from "@/components/community/member-banner";
 import { ContentCard } from "@/components/community/content-card";
+import { FeaturedVideoCard } from "@/components/community/featured-video-card";
+import { FeaturedVideoForm } from "@/components/community/featured-video-form";
 import type { MessageWithAuthor } from "@/components/community/message-list";
 
 type FeaturedContentItem = {
@@ -12,6 +14,13 @@ type FeaturedContentItem = {
   is_locked: boolean;
   channel_slug: string;
   channel_name: string;
+};
+
+type FeaturedVideo = {
+  id: string;
+  title: string;
+  video_url: string;
+  thumbnail_url: string | null;
 };
 
 /**
@@ -27,7 +36,7 @@ export default async function ComunidadePage() {
   } = await supabase.auth.getUser();
   if (!user) return null; // layout.tsx already redirects
 
-  const [{ data: avisos }, { data: profile }, { data: rawContentItems }] =
+  const [{ data: avisos }, { data: profile }, { data: rawContentItems }, { data: rawVideos }] =
     await Promise.all([
       supabase
         .from("channels")
@@ -41,9 +50,15 @@ export default async function ComunidadePage() {
         .eq("status", "approved")
         .order("created_at", { ascending: false })
         .limit(10),
+      supabase
+        .from("featured_videos")
+        .select("id, title, video_url, thumbnail_url")
+        .order("created_at", { ascending: false })
+        .limit(10),
     ]);
 
   const isAdmin = profile?.is_admin ?? false;
+  const featuredVideos: FeaturedVideo[] = rawVideos ?? [];
 
   const featuredContent: FeaturedContentItem[] = (rawContentItems ?? []).map(
     (item) => {
@@ -88,6 +103,48 @@ export default async function ComunidadePage() {
   return (
     <div className="flex flex-col">
       <MemberBanner />
+
+      {(featuredVideos.length > 0 || isAdmin) && (
+        <section className="w-full pt-10 pb-2 md:pt-12">
+          <div className="mb-5 flex items-baseline justify-between px-6 md:px-10">
+            <h2 className="heading-tight-2 text-xl text-white flex items-center gap-2 md:text-2xl">
+              <span aria-hidden>🎬</span> Vídeos em destaque
+            </h2>
+          </div>
+
+          {isAdmin && (
+            <div className="px-6 mb-6 md:px-10">
+              <FeaturedVideoForm />
+            </div>
+          )}
+
+          {featuredVideos.length > 0 && (
+            <div className="relative">
+              <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-3 md:gap-5 md:px-10">
+                {featuredVideos.map((video) => (
+                  <FeaturedVideoCard
+                    key={video.id}
+                    id={video.id}
+                    title={video.title}
+                    videoUrl={video.video_url}
+                    thumbnailUrl={video.thumbnail_url}
+                    canDelete={isAdmin}
+                    className="w-[260px] shrink-0 snap-start sm:w-[320px] md:w-[380px]"
+                  />
+                ))}
+              </div>
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-surface-2 to-transparent md:w-12"
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-surface-2 to-transparent md:w-12"
+              />
+            </div>
+          )}
+        </section>
+      )}
 
       {featuredContent.length > 0 && (
         <section className="w-full pt-10 pb-2 md:pt-12">
