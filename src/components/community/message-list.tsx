@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 export type MessageWithAuthor = {
   id: string;
   content: string;
+  image_url: string | null;
   created_at: string;
   profile_id: string;
   author_name: string;
@@ -45,6 +46,7 @@ export function MessageList({
           const row = payload.new as {
             id: string;
             content: string;
+            image_url: string | null;
             created_at: string;
             profile_id: string;
           };
@@ -103,9 +105,26 @@ export function MessageList({
               })}
             </span>
           </div>
-          <p className="text-sm text-muted leading-relaxed whitespace-pre-wrap break-words">
-            {message.content}
-          </p>
+          {message.content && (
+            <p className="text-sm text-muted leading-relaxed whitespace-pre-wrap break-words">
+              {message.content}
+            </p>
+          )}
+          {message.image_url && (
+            <a
+              href={message.image_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-block w-fit overflow-hidden rounded-lg border border-border-subtle"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={message.image_url}
+                alt=""
+                className="max-h-72 max-w-[280px] object-cover sm:max-w-xs"
+              />
+            </a>
+          )}
         </div>
       ))}
       <div ref={bottomRef} />

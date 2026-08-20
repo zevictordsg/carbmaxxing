@@ -36,6 +36,7 @@ export function FeedList({
           const row = payload.new as {
             id: string;
             content: string;
+            image_url: string | null;
             created_at: string;
             profile_id: string;
           };
@@ -92,9 +93,26 @@ export function FeedList({
               })}
             </span>
           </div>
-          <p className="text-sm text-white leading-relaxed whitespace-pre-wrap break-words mb-2">
-            {message.content}
-          </p>
+          {message.content && (
+            <p className="text-sm text-white leading-relaxed whitespace-pre-wrap break-words mb-2">
+              {message.content}
+            </p>
+          )}
+          {message.image_url && (
+            <a
+              href={message.image_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mb-2 inline-block w-fit overflow-hidden rounded-lg border border-border-subtle"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={message.image_url}
+                alt=""
+                className="max-h-72 max-w-full object-cover sm:max-w-sm"
+              />
+            </a>
+          )}
           <span className="text-xs text-muted-dim">{message.author_name}</span>
         </article>
       ))}

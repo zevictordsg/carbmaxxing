@@ -327,7 +327,7 @@ export default async function ChannelPage({
   // everyone reads, only admins get the composer.
   const { data: rawMessages } = await supabase
     .from("messages")
-    .select("id, content, created_at, profile_id, profiles(display_name)")
+    .select("id, content, image_url, created_at, profile_id, profiles(display_name)")
     .eq("channel_id", channel.id)
     .order("created_at", { ascending: true })
     .limit(200);
@@ -339,6 +339,7 @@ export default async function ChannelPage({
     return {
       id: m.id,
       content: m.content,
+      image_url: m.image_url,
       created_at: m.created_at,
       profile_id: m.profile_id,
       author_name:

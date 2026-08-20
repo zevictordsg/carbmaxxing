@@ -65,7 +65,7 @@ export default async function ComunidadePage() {
   if (avisos) {
     const { data: rawMessages } = await supabase
       .from("messages")
-      .select("id, content, created_at, profile_id, profiles(display_name)")
+      .select("id, content, image_url, created_at, profile_id, profiles(display_name)")
       .eq("channel_id", avisos.id)
       .order("created_at", { ascending: false })
       .limit(50);
@@ -75,6 +75,7 @@ export default async function ComunidadePage() {
       return {
         id: m.id,
         content: m.content,
+        image_url: m.image_url,
         created_at: m.created_at,
         profile_id: m.profile_id,
         author_name:
