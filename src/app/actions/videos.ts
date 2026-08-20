@@ -8,6 +8,7 @@ const CreateVideoSchema = z.object({
   title: z.string().trim().min(3, "Dê um título pro vídeo.").max(120, "Título muito longo."),
   videoUrl: z.string().trim().url("Cole um link válido."),
   description: z.string().trim().max(300, "Descrição muito longa.").optional(),
+  creatorName: z.string().trim().max(60, "Nome muito longo.").optional(),
 });
 
 export type CreateVideoState = { error?: string } | undefined;
@@ -44,6 +45,7 @@ export async function createFeaturedVideo(
     title: formData.get("title"),
     videoUrl: formData.get("videoUrl"),
     description: formData.get("description") || undefined,
+    creatorName: formData.get("creatorName") || undefined,
   });
 
   if (!parsed.success) {
@@ -59,6 +61,7 @@ export async function createFeaturedVideo(
   const { error } = await supabase.from("featured_videos").insert({
     title: parsed.data.title,
     description: parsed.data.description ?? null,
+    creator_name: parsed.data.creatorName ?? null,
     video_url: parsed.data.videoUrl,
     thumbnail_url: extractYoutubeThumbnail(parsed.data.videoUrl),
     created_by: user.id,

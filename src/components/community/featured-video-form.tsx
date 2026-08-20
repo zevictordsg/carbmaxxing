@@ -27,27 +27,30 @@ export function FeaturedVideoForm() {
       </p>
 
       <form ref={formRef} action={formAction} className="mt-4 flex flex-col gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <input
+            type="text"
+            name="creatorName"
+            placeholder="Nome do criador (opcional)"
+            autoComplete="off"
+            maxLength={60}
+            className="w-full rounded-md bg-surface-3 border border-border-subtle text-white placeholder:text-muted-dim text-sm px-4 py-2.5 outline-none focus:border-white/25 transition-colors sm:w-48"
+          />
+          <input
+            type="url"
+            name="videoUrl"
+            placeholder="Link do vídeo (https://...)"
+            autoComplete="off"
+            className="w-full rounded-md bg-surface-3 border border-border-subtle text-white placeholder:text-muted-dim text-sm px-4 py-2.5 outline-none focus:border-white/25 transition-colors"
+          />
+        </div>
         <input
           type="text"
           name="title"
-          placeholder="Título do vídeo"
+          placeholder="Legenda do vídeo (aparece em destaque no card)"
           autoComplete="off"
           maxLength={120}
           className="w-full rounded-md bg-surface-3 border border-border-subtle text-white placeholder:text-muted-dim text-sm px-4 py-2.5 outline-none focus:border-white/25 transition-colors"
-        />
-        <input
-          type="url"
-          name="videoUrl"
-          placeholder="Link do vídeo (https://...)"
-          autoComplete="off"
-          className="w-full rounded-md bg-surface-3 border border-border-subtle text-white placeholder:text-muted-dim text-sm px-4 py-2.5 outline-none focus:border-white/25 transition-colors"
-        />
-        <textarea
-          name="description"
-          placeholder="Descrição (opcional)"
-          maxLength={300}
-          rows={2}
-          className="w-full resize-none rounded-md bg-surface-3 border border-border-subtle text-white placeholder:text-muted-dim text-sm px-4 py-2.5 outline-none focus:border-white/25 transition-colors"
         />
         <div className="flex items-center justify-between gap-3">
           {state?.error ? (

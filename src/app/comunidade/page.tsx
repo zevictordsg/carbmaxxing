@@ -21,6 +21,7 @@ type FeaturedVideo = {
   title: string;
   video_url: string;
   thumbnail_url: string | null;
+  creator_name: string | null;
 };
 
 /**
@@ -52,7 +53,7 @@ export default async function ComunidadePage() {
         .limit(10),
       supabase
         .from("featured_videos")
-        .select("id, title, video_url, thumbnail_url")
+        .select("id, title, video_url, thumbnail_url, creator_name")
         .order("created_at", { ascending: false })
         .limit(10),
     ]);
@@ -105,22 +106,20 @@ export default async function ComunidadePage() {
       <MemberBanner />
 
       {(featuredVideos.length > 0 || isAdmin) && (
-        <section className="w-full pt-10 pb-2 md:pt-12">
-          <div className="mb-5 flex items-baseline justify-between px-6 md:px-10">
-            <h2 className="heading-tight-2 text-xl text-white flex items-center gap-2 md:text-2xl">
+        <div className="px-6 pt-10 md:px-10 md:pt-12">
+          <section className="max-w-2xl">
+            <h2 className="heading-tight-2 text-xl text-white flex items-center gap-2 mb-5 md:text-2xl">
               <span aria-hidden>🎬</span> Vídeos em destaque
             </h2>
-          </div>
 
-          {isAdmin && (
-            <div className="px-6 mb-6 md:px-10">
-              <FeaturedVideoForm />
-            </div>
-          )}
+            {isAdmin && (
+              <div className="mb-6">
+                <FeaturedVideoForm />
+              </div>
+            )}
 
-          {featuredVideos.length > 0 && (
-            <div className="relative">
-              <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-3 md:gap-5 md:px-10">
+            {featuredVideos.length > 0 && (
+              <div className="flex flex-col gap-4">
                 {featuredVideos.map((video) => (
                   <FeaturedVideoCard
                     key={video.id}
@@ -128,22 +127,14 @@ export default async function ComunidadePage() {
                     title={video.title}
                     videoUrl={video.video_url}
                     thumbnailUrl={video.thumbnail_url}
+                    creatorName={video.creator_name}
                     canDelete={isAdmin}
-                    className="w-[260px] shrink-0 snap-start sm:w-[320px] md:w-[380px]"
                   />
                 ))}
               </div>
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-surface-2 to-transparent md:w-12"
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-surface-2 to-transparent md:w-12"
-              />
-            </div>
-          )}
-        </section>
+            )}
+          </section>
+        </div>
       )}
 
       {featuredContent.length > 0 && (

@@ -3,11 +3,27 @@
 import { useState, useTransition } from "react";
 import { deleteFeaturedVideo } from "@/app/actions/videos";
 
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+  return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
+}
+
+/**
+ * Styled after a "creator posted a new video" notification bot card (the
+ * reference the user shared was a Discord "NotifyMe" bot post): a bold
+ * auto-generated headline, then a nested embed with the creator's
+ * initials avatar, caption, thumbnail, and a watch button. Publishing is
+ * still manual (an admin pastes the link) -- see AGENTS.md/FeaturedVideoForm
+ * for why we didn't build real auto-detection of new TikTok posts.
+ */
 export function FeaturedVideoCard({
   id,
   title,
   videoUrl,
   thumbnailUrl,
+  creatorName,
   canDelete = false,
   className = "",
 }: {
@@ -15,6 +31,7 @@ export function FeaturedVideoCard({
   title: string;
   videoUrl: string;
   thumbnailUrl: string | null;
+  creatorName: string | null;
   canDelete?: boolean;
   className?: string;
 }) {
@@ -23,42 +40,52 @@ export function FeaturedVideoCard({
 
   if (removed) return null;
 
+  const headline = creatorName
+    ? `O ${creatorName.toUpperCase()} ACABOU DE POSTAR VÍDEO NOVO`
+    : "VÍDEO NOVO PUBLICADO";
+
   return (
-    <div className={`group relative ${className}`}>
+    <div className={`group relative rounded-xl border-l-4 border-amber-400 bg-surface pl-4 pr-3 py-3 sm:pl-5 ${className}`}>
+      <p className="label-loose text-[9px] text-muted-dim mb-1.5 flex items-center gap-1.5">
+        <span aria-hidden>🔔</span> Notificação
+      </p>
+      <p className="text-sm font-semibold tracking-tight text-white mb-3">{headline}</p>
+
       <a
         href={videoUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative block aspect-video w-full overflow-hidden rounded-xl border border-amber-400/40 bg-surface-3"
+        className="block overflow-hidden rounded-lg border-l-4 border-amber-400/50 bg-surface-3"
       >
-        {thumbnailUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={thumbnailUrl}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-4xl" aria-hidden>
-            🎬
+        {creatorName && (
+          <div className="flex items-center gap-2 px-3 pt-3">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/[0.08] text-[10px] font-semibold text-white">
+              {initials(creatorName)}
+            </span>
+            <span className="text-sm font-semibold text-white">{creatorName}</span>
           </div>
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
-
-        <span className="absolute top-3 left-3 label-loose text-[9px] text-black bg-amber-400 rounded-full px-2.5 py-1 flex items-center gap-1 shadow">
-          <span aria-hidden>⭐</span> Destaque
-        </span>
-
-        <span className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-black">
-            ▶
-          </span>
-        </span>
-
-        <p className="absolute bottom-0 left-0 right-0 p-3 heading-tight-2 text-sm text-white leading-tight line-clamp-2 sm:p-4 sm:text-base">
+        <p className="px-3 pt-2 pb-3 text-sm text-muted leading-relaxed whitespace-pre-wrap break-words">
           {title}
         </p>
+
+        <div className="relative aspect-video w-full bg-surface">
+          {thumbnailUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={thumbnailUrl} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-4xl" aria-hidden>
+              🎬
+            </div>
+          )}
+        </div>
+
+        <div className="p-3">
+          <span className="label-loose text-[10px] text-white bg-white/[0.08] group-hover:bg-white/[0.14] transition-colors rounded-md px-4 py-2 inline-flex items-center gap-1.5">
+            <span aria-hidden>▶</span> Assistir vídeo
+          </span>
+        </div>
       </a>
 
       {canDelete && (
