@@ -5,6 +5,26 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CATEGORY_EMOJI, channelEmoji, type ChannelGroup } from "@/lib/channels";
 
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0]!.slice(0, 2).toUpperCase();
+  return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
+}
+
+function AvatarThumb({ displayName, avatarUrl }: { displayName: string; avatarUrl: string | null }) {
+  return (
+    <div className="h-8 w-8 shrink-0 overflow-hidden rounded-full border border-border-subtle bg-surface-3 flex items-center justify-center">
+      {avatarUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={avatarUrl} alt="" className="h-full w-full object-cover" />
+      ) : (
+        <span className="text-[10px] font-semibold text-muted">{initials(displayName)}</span>
+      )}
+    </div>
+  );
+}
+
 function NavBody({
   groups,
   pathname,
@@ -28,6 +48,18 @@ function NavBody({
         }`}
       >
         <span aria-hidden>🔥</span> Feed
+      </Link>
+
+      <Link
+        href="/comunidade/perfil"
+        onClick={onNavigate}
+        className={`flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium tracking-tight transition-colors ${
+          pathname === "/comunidade/perfil"
+            ? "bg-white/[0.06] text-white"
+            : "text-muted hover:text-white hover:bg-white/[0.04]"
+        }`}
+      >
+        <span aria-hidden>👤</span> Perfil
       </Link>
 
       {isAdmin && (
@@ -88,11 +120,13 @@ function NavBody({
 
 export function Sidebar({
   displayName,
+  avatarUrl,
   isAdmin,
   groups,
   logoutAction,
 }: {
   displayName: string;
+  avatarUrl: string | null;
   isAdmin: boolean;
   groups: ChannelGroup[];
   logoutAction: () => void;
@@ -133,10 +167,17 @@ export function Sidebar({
             isAdmin={isAdmin}
             onNavigate={() => setMobileOpen(false)}
           />
-          <div className="border-t border-border-subtle px-3 pt-3 flex items-center justify-between">
-            <span className="text-sm font-medium tracking-tight text-white truncate">
-              {displayName}
-            </span>
+          <div className="border-t border-border-subtle px-3 pt-3 flex items-center justify-between gap-2">
+            <Link
+              href="/comunidade/perfil"
+              onClick={() => setMobileOpen(false)}
+              className="flex min-w-0 items-center gap-2"
+            >
+              <AvatarThumb displayName={displayName} avatarUrl={avatarUrl} />
+              <span className="text-sm font-medium tracking-tight text-white truncate">
+                {displayName}
+              </span>
+            </Link>
             {logoutButton}
           </div>
         </div>
@@ -151,9 +192,12 @@ export function Sidebar({
         <NavBody groups={groups} pathname={pathname} isAdmin={isAdmin} />
 
         <div className="border-t border-border-subtle px-4 py-4 flex items-center justify-between gap-2">
-          <span className="text-sm font-medium tracking-tight text-white truncate">
-            {displayName}
-          </span>
+          <Link href="/comunidade/perfil" className="flex min-w-0 items-center gap-2">
+            <AvatarThumb displayName={displayName} avatarUrl={avatarUrl} />
+            <span className="text-sm font-medium tracking-tight text-white truncate">
+              {displayName}
+            </span>
+          </Link>
           {logoutButton}
         </div>
       </aside>

@@ -18,7 +18,7 @@ export default async function ComunidadeLayout({
   const [{ data: profile }, { data: channels }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("display_name, is_admin")
+      .select("display_name, avatar_url, is_admin")
       .eq("id", user.id)
       .single(),
     supabase
@@ -33,6 +33,7 @@ export default async function ComunidadeLayout({
     <div className="flex min-h-screen flex-col md:flex-row bg-surface-2">
       <Sidebar
         displayName={profile?.display_name ?? user.email ?? "Membro"}
+        avatarUrl={profile?.avatar_url ?? null}
         isAdmin={profile?.is_admin ?? false}
         groups={groups}
         logoutAction={logout}
