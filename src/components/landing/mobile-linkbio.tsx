@@ -5,9 +5,9 @@ import Link from "next/link";
  * Mobile landing screen — 1:1 with Figma "Phone" (node 2549:1305).
  * Link-in-bio style: logo, header, three link cards, footer handle.
  *
- * Expected image drops (see /public/images/landing/README.md):
- *   mobile-hero.jpg, icon-community.png, icon-auralab.png,
- *   icon-tiktok.png, logo-mark.svg
+ * Image drops (see /public/images/landing/README.md):
+ *   mobile-hero.webp, icon-community.webp, icon-auralab.webp,
+ *   icon-tiktok.webp, logo-mark.svg, card-texture.png
  *
  * NOTE: "Baixe o Auralab" points at a placeholder "#" href until you give
  * me the real app/website link -- swap AURALAB_URL below once you have it.
@@ -22,10 +22,22 @@ function LinkCard({
   style,
   animationDelay,
   icon,
+  // "left" bleeds the artwork off the card's left edge (cards 1 and 3 in
+  // Figma); "right" mirrors that for card 2, where the "A" bleeds off the
+  // right edge instead, with the text on the left.
+  iconPosition = "left",
   title,
   subtitle,
   titleClassName = "text-white",
   subtitleClassName = "text-white/60",
+  // The grunge texture is light-colored, so it only reads clearly against
+  // a dark base with "screen" (which adds light and disappears on white).
+  // "overlay" keeps some contrast on the red/mid-tone card. Default to
+  // overlay; the near-black card below opts into screen explicitly.
+  textureBlend = "overlay",
+  // Per-card texture override -- the TikTok card uses its own artwork
+  // instead of the shared grunge pattern.
+  textureSrc = "/images/landing/card-texture.png",
 }: {
   href: string;
   external?: boolean;
@@ -33,28 +45,69 @@ function LinkCard({
   style?: React.CSSProperties;
   animationDelay?: string;
   icon: React.ReactNode;
+  iconPosition?: "left" | "right";
   title: string;
   subtitle: string;
   titleClassName?: string;
   subtitleClassName?: string;
+  textureBlend?: "overlay" | "screen";
+  textureSrc?: string;
 }) {
+  const textBlock = (
+    <div className="relative flex flex-1 flex-col items-center gap-0.5 text-center">
+      <span className={`text-sm font-bold tracking-tight ${titleClassName}`}>
+        {title}
+      </span>
+      <span className={`text-xs tracking-tight ${subtitleClassName}`}>
+        {subtitle}
+      </span>
+    </div>
+  );
+
+  // items-center + an icon taller than the card makes it bleed evenly past
+  // the top/bottom edges on its own; overflow-hidden on the card (+ its
+  // rounded corners) clips that overflow -- same effect as the Figma
+  // frame, no manual vertical offset math needed.
+  const iconBlock = (
+    <div
+      className={`relative shrink-0 ${iconPosition === "left" ? "-ml-5" : "-mr-5 ml-auto"}`}
+    >
+      {icon}
+    </div>
+  );
+
   return (
     <Link
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
       style={{ ...style, animationDelay }}
-      className={`animate-fade-up relative flex items-center gap-4 w-full h-[72px] rounded-xl px-5 ${className}`}
+      className={`animate-fade-up group relative flex items-center gap-4 w-full h-[72px] overflow-hidden rounded-xl px-5 transition-transform duration-200 ease-out hover:scale-[1.015] active:scale-[0.97] ${className}`}
     >
-      <div className="shrink-0">{icon}</div>
-      <div className="flex flex-col gap-0.5">
-        <span className={`text-sm font-bold tracking-tight ${titleClassName}`}>
-          {title}
-        </span>
-        <span className={`text-xs tracking-tight ${subtitleClassName}`}>
-          {subtitle}
-        </span>
-      </div>
+      {/* Grunge texture overlay -- centered (not tiled from the corner) so
+          the pattern reads as a single centered motif on each card. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-200 group-hover:opacity-90"
+        style={{
+          backgroundImage: `url(${textureSrc})`,
+          backgroundRepeat: "repeat",
+          backgroundPosition: "center",
+          backgroundSize: "220px auto",
+          mixBlendMode: textureBlend,
+        }}
+      />
+      {iconPosition === "left" ? (
+        <>
+          {iconBlock}
+          {textBlock}
+        </>
+      ) : (
+        <>
+          {textBlock}
+          {iconBlock}
+        </>
+      )}
     </Link>
   );
 }
@@ -62,14 +115,20 @@ function LinkCard({
 export function MobileLinkBio() {
   return (
     <section className="relative flex md:hidden min-h-screen w-full flex-col items-center overflow-hidden bg-[#050505]">
-      <Image
-        src="/images/landing/mobile-hero.webp"
-        alt=""
-        fill
-        priority
-        className="object-cover object-top opacity-70"
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black" />
+      {/* Hero photo is contained to the top ~52% of the screen instead of
+          the full viewport -- keeps the "vulto atrás do vidro" as a
+          framed backdrop instead of dominating the whole page, matching
+          the reference where the card stack reads as the focal point. */}
+      <div className="absolute inset-x-0 top-0 h-[52vh] min-h-[380px]">
+        <Image
+          src="/images/landing/mobile-hero.webp"
+          alt=""
+          fill
+          priority
+          className="object-cover object-top opacity-95"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/25 to-[#050505]" />
+      </div>
 
       <div className="relative z-10 flex flex-col items-center w-full px-6 pt-8">
         <Image
@@ -81,7 +140,7 @@ export function MobileLinkBio() {
         />
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col items-center justify-end w-full px-6 pb-10 pt-40">
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-end w-full px-6 pb-10 pt-10">
         <div className="flex flex-col items-center gap-1.5 mb-8 text-center animate-fade-up">
           <h1 className="heading-tight-2 text-lg text-white">
             Tudo o que você precisa
@@ -96,13 +155,14 @@ export function MobileLinkBio() {
             href="/cadastro"
             animationDelay="120ms"
             className="bg-black border border-white/[0.07]"
+            textureBlend="screen"
             icon={
-              <div className="relative w-11 h-11 -rotate-[5deg] rounded-md overflow-hidden shadow-lg">
+              <div className="relative w-[86px] h-[103px] -rotate-[5deg] drop-shadow-lg">
                 <Image
-                  src="/images/landing/icon-community.png"
+                  src="/images/landing/icon-community.webp"
                   alt=""
                   fill
-                  className="object-cover"
+                  className="object-contain"
                 />
               </div>
             }
@@ -119,10 +179,11 @@ export function MobileLinkBio() {
               backgroundImage:
                 "linear-gradient(170deg, rgb(211,19,19) 6%, rgb(117,18,24) 94%)",
             }}
+            iconPosition="right"
             icon={
-              <div className="relative w-9 h-11">
+              <div className="relative w-[78px] h-[96px] drop-shadow-lg">
                 <Image
-                  src="/images/landing/icon-auralab.png"
+                  src="/images/landing/icon-auralab.webp"
                   alt=""
                   fill
                   className="object-contain"
@@ -138,10 +199,14 @@ export function MobileLinkBio() {
             external
             animationDelay="320ms"
             className="bg-[#f0f0f0] border border-white/[0.07]"
+            // TODO: swap for /images/landing/tiktok-texture.png once you send
+            // me "Group 1171276566.png" -- using the shared grunge texture
+            // as a placeholder until then.
+            textureBlend="overlay"
             icon={
-              <div className="relative w-9 h-11 rotate-[4deg]">
+              <div className="relative w-[90px] h-[102px] rotate-[5deg] drop-shadow-lg">
                 <Image
-                  src="/images/landing/icon-tiktok.png"
+                  src="/images/landing/icon-tiktok.webp"
                   alt=""
                   fill
                   className="object-contain"

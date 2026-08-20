@@ -9,11 +9,14 @@ sem eu precisar tocar em código:
 |---|---|---|
 | `desktop-hero.webp` ✅ | Foto dos dois caras na mesa (camada "Gemini_Generated_Image_yrlmjsyrlmjsyrlm") | `DesktopHero` (fundo full-bleed) |
 | `mobile-hero.webp` ✅ | Foto do "vulto atrás do vidro" (camada "image 52") | `MobileLinkBio` (fundo do topo) |
-| `icon-community.png` | Ícone da caveira do card "Carbmaxxing Community" | `MobileLinkBio` (1º card) |
-| `icon-auralab.png` | Ícone do "A" do card "Baixe o Auralab" | `MobileLinkBio` (2º card) |
-| `icon-tiktok.png` | Ícone da notinha musical do card "Siga-me no Tiktok" | `MobileLinkBio` (3º card) |
-| `logo-mark.svg` | Logo pequena "Z" no topo da tela mobile | `MobileLinkBio` (topo) |
+| `icon-community.webp` ✅ | Ícone da caveira do card "Carbmaxxing Community" | `MobileLinkBio` (1º card) |
+| `icon-auralab.webp` ✅ | Ícone do "A" do card "Baixe o Auralab" | `MobileLinkBio` (2º card) |
+| `icon-tiktok.webp` ✅ | Ícone da notinha musical do card "Siga-me no Tiktok" | `MobileLinkBio` (3º card) |
+| `logo-mark.svg` ✅ | Logo pequena "Z" no topo da tela mobile | `MobileLinkBio` (topo) |
+| `card-texture.png` ✅ | Textura de grunge repetida | `MobileLinkBio` (overlay dos 3 cards, mix-blend-overlay) |
 
-Formatos: os ícones podem ser `.png` com fundo transparente; as fotos de
-fundo podem ser `.jpg` (ou troque a extensão no componente se exportar
-como `.png`/`.webp`).
+Ainda falta: `icon-community.png`/`icon-auralab.png`/`icon-tiktok.png` em
+PNG puro não são necessários -- os `.webp` com fundo transparente já
+funcionam igual. Formatos: os ícones têm fundo transparente (RGBA); a
+textura é um PNG pequeno pensado pra repetir (`background-repeat`), não
+pra esticar.
