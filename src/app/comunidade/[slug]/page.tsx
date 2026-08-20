@@ -131,6 +131,20 @@ export default async function ChannelPage({
     const myPending = isAdmin ? [] : pending.filter((i) => i.submitted_by === user.id);
     const acceptsSubmissions = channel.slug === "receitas";
 
+    // Locked+approved items are already excluded from `items` by RLS for
+    // anyone without access (see 0010_content_access_gate.sql) -- admins
+    // bypass that and see them normally (with the real title) inside
+    // `approved` above. This count powers a generic teaser card for
+    // everyone else, so locked content still shows as "exists" without
+    // leaking its title/description.
+    let hiddenLockedCount = 0;
+    if (!isAdmin) {
+      const { data: lockedCount } = await supabase.rpc("count_locked_content", {
+        p_channel_id: channel.id,
+      });
+      hiddenLockedCount = lockedCount ?? 0;
+    }
+
     return (
       <div className="px-6 py-10 md:px-10 md:py-12">
         <p className="label-loose text-[10px] text-muted-dim mb-2">📚 Conteúdo</p>
@@ -193,7 +207,7 @@ export default async function ChannelPage({
           </div>
         )}
 
-        {approved.length > 0 ? (
+        {approved.length > 0 || hiddenLockedCount > 0 ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {approved.map((item) => (
               <ContentCard
@@ -201,6 +215,14 @@ export default async function ChannelPage({
                 categoryLabel={channel.name}
                 title={item.title}
                 isLocked={item.is_locked}
+              />
+            ))}
+            {Array.from({ length: hiddenLockedCount }).map((_, i) => (
+              <ContentCard
+                key={`locked-${i}`}
+                categoryLabel={channel.name}
+                title="Conteúdo exclusivo"
+                isLocked
               />
             ))}
           </div>
