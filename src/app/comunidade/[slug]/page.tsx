@@ -6,7 +6,19 @@ import {
 } from "@/components/community/message-list";
 import { MessageComposer } from "@/components/community/message-composer";
 import { ContentCard } from "@/components/community/content-card";
+import { RecipeSubmitForm } from "@/components/community/recipe-submit-form";
+import { ModerationRow } from "@/components/community/moderation-row";
 import { channelEmoji } from "@/lib/channels";
+
+// Per-channel composer copy so each chat feels like its own place instead
+// of one generic text box repeated everywhere.
+const COMPOSER_PLACEHOLDER: Record<string, string> = {
+  "chat-geral": "Escreva uma mensagem...",
+  "apresente-se": "Conte quem você é e qual seu objetivo...",
+  "refeicoes-sincronizadas": "Descreva sua refeição (fotos chegam em breve)...",
+  "comidas-base": "Compartilhe uma comida base do protocolo...",
+  sugestoes: "Sua sugestão pra comunidade ou pro app...",
+};
 
 type StaticStep = { icon: string; title: string; description: string };
 type StaticPage = { icon: string; title: string; steps: StaticStep[] };
@@ -100,11 +112,20 @@ export default async function ChannelPage({
   const emoji = channelEmoji(channel.slug);
 
   if (channel.category === "conteudo") {
-    const { data: items } = await supabase
+    // RLS already scopes this to: approved items (everyone) + the caller's
+    // own pending/rejected submissions + everything if the caller is admin
+    // (see supabase/migrations/0004_content_submissions.sql).
+    const { data: rawItems } = await supabase
       .from("content_items")
-      .select("id, title, is_locked")
+      .select("id, title, description, is_locked, status, submitted_by, profiles(display_name)")
       .eq("channel_id", channel.id)
       .order("order", { ascending: true });
+
+    const items = rawItems ?? [];
+    const approved = items.filter((i) => i.status === "approved");
+    const pending = items.filter((i) => i.status === "pending");
+    const myPending = isAdmin ? [] : pending.filter((i) => i.submitted_by === user.id);
+    const acceptsSubmissions = channel.slug === "receitas";
 
     return (
       <div className="px-6 py-10 md:px-10 md:py-12">
@@ -113,12 +134,64 @@ export default async function ChannelPage({
           <span aria-hidden>{emoji}</span> {channel.name}
         </h1>
         {channel.description && (
-          <p className="text-muted max-w-md text-sm mb-10">{channel.description}</p>
+          <p className="text-muted max-w-md text-sm mb-6">{channel.description}</p>
         )}
 
-        {items && items.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {items.map((item) => (
+        {acceptsSubmissions && (
+          <div className="mb-10 max-w-2xl">
+            <RecipeSubmitForm />
+          </div>
+        )}
+
+        {isAdmin && pending.length > 0 && (
+          <div className="mb-10">
+            <p className="label-loose text-[10px] text-muted-dim mb-3 flex items-center gap-1.5">
+              <span aria-hidden>⏳</span> Pendentes de aprovação ({pending.length})
+            </p>
+            <div className="flex max-w-2xl flex-col gap-3">
+              {pending.map((item) => {
+                const profileRow = Array.isArray(item.profiles) ? item.profiles[0] : item.profiles;
+                return (
+                  <ModerationRow
+                    key={item.id}
+                    itemId={item.id}
+                    title={item.title}
+                    description={item.description}
+                    authorName={
+                      (profileRow as { display_name: string } | null | undefined)
+                        ?.display_name ?? "Membro"
+                    }
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {myPending.length > 0 && (
+          <div className="mb-10 max-w-2xl">
+            <p className="label-loose text-[10px] text-muted-dim mb-3">
+              📤 Suas submissões
+            </p>
+            <div className="flex flex-col gap-2">
+              {myPending.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-border-subtle bg-surface px-4 py-3"
+                >
+                  <span className="text-sm text-white truncate">{item.title}</span>
+                  <span className="label-loose text-[9px] text-muted-dim shrink-0">
+                    ⏳ Em análise
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {approved.length > 0 ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5 lg:grid-cols-4">
+            {approved.map((item) => (
               <ContentCard
                 key={item.id}
                 categoryLabel={channel.name}
@@ -129,7 +202,11 @@ export default async function ChannelPage({
           </div>
         ) : (
           <div className="rounded-xl border border-border-subtle bg-surface px-6 py-10 text-center">
-            <p className="text-sm text-muted-dim">Conteúdo chega em breve.</p>
+            <p className="text-sm text-muted-dim">
+              {acceptsSubmissions
+                ? "Nenhuma receita aprovada ainda — a sua pode ser a primeira!"
+                : "Conteúdo chega em breve."}
+            </p>
           </div>
         )}
       </div>
@@ -217,7 +294,9 @@ export default async function ChannelPage({
         <MessageComposer
           channelId={channel.id}
           placeholder={
-            channel.admin_only_posting ? "Publicar um aviso..." : "Escreva uma mensagem..."
+            channel.admin_only_posting
+              ? "Publicar um aviso..."
+              : COMPOSER_PLACEHOLDER[channel.slug] ?? "Escreva uma mensagem..."
           }
         />
       ) : (

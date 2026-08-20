@@ -21,9 +21,11 @@ function CardInner({
         </div>
       )}
 
-      <div className="absolute bottom-0 left-0 right-0 p-4">
-        <p className="label-loose text-[10px] text-white/60">[{categoryLabel}]</p>
-        <p className="heading-tight-2 text-lg text-white leading-tight mt-0.5">
+      <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
+        <p className="label-loose text-[9px] text-white/60 sm:text-[10px]">
+          [{categoryLabel}]
+        </p>
+        <p className="heading-tight-2 text-base text-white leading-tight mt-0.5 line-clamp-2 sm:text-lg">
           {title}
         </p>
       </div>

@@ -38,6 +38,7 @@ export default async function ComunidadePage() {
       supabase
         .from("content_items")
         .select("id, title, is_locked, created_at, channels(slug, name)")
+        .eq("status", "approved")
         .order("created_at", { ascending: false })
         .limit(10),
     ]);
@@ -87,36 +88,36 @@ export default async function ComunidadePage() {
     <div className="flex flex-col">
       <MemberBanner />
 
-      <div className="px-6 py-10 md:px-10 md:py-12 max-w-5xl">
-        {featuredContent.length > 0 && (
-          <section>
-            <div className="mb-4 flex items-baseline justify-between">
-              <h2 className="heading-tight-2 text-lg text-white flex items-center gap-2">
-                <span aria-hidden>📚</span> Meus conteúdos
-              </h2>
-              <Link
-                href="/comunidade/receitas"
-                className="text-xs text-muted-dim transition-colors hover:text-white"
-              >
-                Ver tudo →
-              </Link>
-            </div>
-            <div className="scrollbar-hide -mx-6 flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-2 md:-mx-10 md:px-10">
-              {featuredContent.map((item) => (
-                <ContentCard
-                  key={item.id}
-                  href={item.channel_slug ? `/comunidade/${item.channel_slug}` : undefined}
-                  categoryLabel={item.channel_name}
-                  title={item.title}
-                  isLocked={item.is_locked}
-                  className="w-[190px] shrink-0 snap-start sm:w-[220px]"
-                />
-              ))}
-            </div>
-          </section>
-        )}
+      {featuredContent.length > 0 && (
+        <section className="w-full pt-10 pb-2 md:pt-12">
+          <div className="mb-5 flex items-baseline justify-between px-6 md:px-10">
+            <h2 className="heading-tight-2 text-xl text-white flex items-center gap-2 md:text-2xl">
+              <span aria-hidden>📚</span> Meus conteúdos
+            </h2>
+            <Link
+              href="/comunidade/receitas"
+              className="text-xs text-muted-dim transition-colors hover:text-white"
+            >
+              Ver tudo →
+            </Link>
+          </div>
+          <div className="carousel-fade scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-3 md:gap-5 md:px-10">
+            {featuredContent.map((item) => (
+              <ContentCard
+                key={item.id}
+                href={item.channel_slug ? `/comunidade/${item.channel_slug}` : undefined}
+                categoryLabel={item.channel_name}
+                title={item.title}
+                isLocked={item.is_locked}
+                className="w-[240px] shrink-0 snap-start sm:w-[280px] md:w-[320px]"
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
-        <section className="mt-12 max-w-2xl">
+      <div className="px-6 py-10 md:px-10 md:py-12">
+        <section className="max-w-2xl">
           <p className="label-loose text-[10px] text-muted-dim mb-2 flex items-center gap-1.5">
             <span aria-hidden>📌</span> Feed
           </p>
