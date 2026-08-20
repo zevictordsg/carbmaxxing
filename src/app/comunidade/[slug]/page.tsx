@@ -8,7 +8,11 @@ import { MessageComposer } from "@/components/community/message-composer";
 import { ContentCard } from "@/components/community/content-card";
 import { RecipeSubmitForm } from "@/components/community/recipe-submit-form";
 import { ModerationRow } from "@/components/community/moderation-row";
+import { EventCard } from "@/components/community/event-card";
+import { EventListItem } from "@/components/community/event-list-item";
+import { EventCreateForm } from "@/components/community/event-create-form";
 import { channelEmoji } from "@/lib/channels";
+import { nowMs } from "@/lib/time";
 
 // Per-channel composer copy so each chat feels like its own place instead
 // of one generic text box repeated everywhere.
@@ -207,6 +211,79 @@ export default async function ChannelPage({
                 ? "Nenhuma receita aprovada ainda — a sua pode ser a primeira!"
                 : "Conteúdo chega em breve."}
             </p>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (channel.category === "eventos") {
+    const { data: rawEvents } = await supabase
+      .from("events")
+      .select("id, title, description, scheduled_at, external_url")
+      .order("scheduled_at", { ascending: true });
+
+    const events = rawEvents ?? [];
+    const now = nowMs();
+    const upcoming = events.filter((e) => new Date(e.scheduled_at).getTime() >= now);
+    const past = events
+      .filter((e) => new Date(e.scheduled_at).getTime() < now)
+      .sort((a, b) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime());
+
+    const [next, ...rest] = upcoming;
+
+    return (
+      <div className="px-6 py-10 md:px-10 md:py-12 max-w-2xl">
+        <p className="label-loose text-[10px] text-muted-dim mb-2">🎥 Calls & Eventos</p>
+        <h1 className="heading-tight-2 text-2xl text-white mb-6 flex items-center gap-2">
+          <span aria-hidden>{emoji}</span> {channel.name}
+        </h1>
+
+        {isAdmin && (
+          <div className="mb-8">
+            <EventCreateForm />
+          </div>
+        )}
+
+        {next ? (
+          <div className="mb-8">
+            <EventCard
+              title={next.title}
+              description={next.description}
+              scheduledAt={next.scheduled_at}
+              externalUrl={next.external_url}
+            />
+          </div>
+        ) : (
+          <div className="mb-8 rounded-xl border border-border-subtle bg-surface px-6 py-10 text-center">
+            <p className="text-sm text-muted-dim">Nenhuma call agendada no momento.</p>
+          </div>
+        )}
+
+        {rest.length > 0 && (
+          <div className="mb-8">
+            <p className="label-loose text-[10px] text-muted-dim mb-3">Próximas</p>
+            <div className="flex flex-col gap-2">
+              {rest.map((e) => (
+                <EventListItem
+                  key={e.id}
+                  title={e.title}
+                  scheduledAt={e.scheduled_at}
+                  externalUrl={e.external_url}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {past.length > 0 && (
+          <div>
+            <p className="label-loose text-[10px] text-muted-dim mb-3">Passadas</p>
+            <div className="flex flex-col gap-2">
+              {past.slice(0, 10).map((e) => (
+                <EventListItem key={e.id} title={e.title} scheduledAt={e.scheduled_at} past />
+              ))}
+            </div>
           </div>
         )}
       </div>

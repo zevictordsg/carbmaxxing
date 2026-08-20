@@ -11,12 +11,14 @@ export type Channel = {
 export const CATEGORY_LABELS: Record<string, string> = {
   inicio: "Início",
   comunidade: "Comunidade",
+  eventos: "Calls & Eventos",
   conteudo: "Conteúdo",
 };
 
 export const CATEGORY_EMOJI: Record<string, string> = {
   inicio: "🏠",
   comunidade: "💬",
+  eventos: "🎥",
   conteudo: "📚",
 };
 
@@ -29,6 +31,7 @@ export const CHANNEL_EMOJI: Record<string, string> = {
   "refeicoes-sincronizadas": "🍽️",
   "comidas-base": "🥗",
   sugestoes: "💡",
+  calls: "🎥",
   receitas: "🍳",
   treinos: "🏋️",
   "duvidas-frequentes": "❓",
@@ -39,7 +42,7 @@ export function channelEmoji(slug: string): string {
 }
 
 // Fixed display order regardless of what order rows come back from Supabase in.
-export const CATEGORY_ORDER = ["inicio", "comunidade", "conteudo"];
+export const CATEGORY_ORDER = ["inicio", "comunidade", "eventos", "conteudo"];
 
 export type ChannelGroup = {
   category: string;
