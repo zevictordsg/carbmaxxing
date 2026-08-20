@@ -101,17 +101,29 @@ export default async function ComunidadePage() {
               Ver tudo →
             </Link>
           </div>
-          <div className="carousel-fade scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-3 md:gap-5 md:px-10">
-            {featuredContent.map((item) => (
-              <ContentCard
-                key={item.id}
-                href={item.channel_slug ? `/comunidade/${item.channel_slug}` : undefined}
-                categoryLabel={item.channel_name}
-                title={item.title}
-                isLocked={item.is_locked}
-                className="w-[240px] shrink-0 snap-start sm:w-[280px] md:w-[320px]"
-              />
-            ))}
+          <div className="relative">
+            <div className="scrollbar-hide flex snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-3 md:gap-5 md:px-10">
+              {featuredContent.map((item) => (
+                <ContentCard
+                  key={item.id}
+                  href={item.channel_slug ? `/comunidade/${item.channel_slug}` : undefined}
+                  categoryLabel={item.channel_name}
+                  title={item.title}
+                  isLocked={item.is_locked}
+                  className="w-[200px] shrink-0 snap-start sm:w-[230px] md:w-[250px]"
+                />
+              ))}
+            </div>
+            {/* Edge fades signal there's more to scroll -- plain gradient
+                overlays instead of a CSS mask, which rendered inconsistently. */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-surface-2 to-transparent md:w-12"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-surface-2 to-transparent md:w-12"
+            />
           </div>
         </section>
       )}

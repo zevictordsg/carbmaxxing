@@ -190,7 +190,7 @@ export default async function ChannelPage({
         )}
 
         {approved.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {approved.map((item) => (
               <ContentCard
                 key={item.id}
