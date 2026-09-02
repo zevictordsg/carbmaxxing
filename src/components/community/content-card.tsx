@@ -6,13 +6,19 @@ function CardInner({
   categoryLabel,
   title,
   isLocked,
+  coverUrl,
 }: {
   categoryLabel: string;
   title: string;
   isLocked: boolean;
+  coverUrl?: string | null;
 }) {
   return (
     <CoverPlaceholder className="aspect-[3/4] w-full rounded-xl">
+      {coverUrl && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
 
       {isLocked && (
@@ -45,25 +51,27 @@ export function ContentCard({
   categoryLabel,
   title,
   isLocked,
+  coverUrl,
   className = "",
 }: {
   href?: string;
   categoryLabel: string;
   title: string;
   isLocked: boolean;
+  coverUrl?: string | null;
   className?: string;
 }) {
   if (href) {
     return (
       <Link href={href} className={`group block ${className}`}>
-        <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} />
+        <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} coverUrl={coverUrl} />
       </Link>
     );
   }
 
   return (
     <div className={className}>
-      <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} />
+      <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} coverUrl={coverUrl} />
     </div>
   );
 }

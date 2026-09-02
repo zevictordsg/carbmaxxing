@@ -1,8 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/actions/auth";
-import { Sidebar } from "@/components/community/sidebar";
-import { groupChannelsByCategory, type Channel } from "@/lib/channels";
+import { TopBar } from "@/components/community/top-bar";
 
 export default async function ComunidadeLayout({
   children,
@@ -15,27 +14,18 @@ export default async function ComunidadeLayout({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: profile }, { data: channels }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .select("display_name, avatar_url, is_admin")
-      .eq("id", user.id)
-      .single(),
-    supabase
-      .from("channels")
-      .select("id, name, slug, description, category, admin_only_posting, order")
-      .order("order"),
-  ]);
-
-  const groups = groupChannelsByCategory((channels ?? []) as Channel[]);
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name, avatar_url, is_admin")
+    .eq("id", user.id)
+    .single();
 
   return (
-    <div className="flex min-h-screen flex-col md:flex-row bg-surface-2">
-      <Sidebar
+    <div className="flex min-h-screen flex-col bg-surface-2">
+      <TopBar
         displayName={profile?.display_name ?? user.email ?? "Membro"}
         avatarUrl={profile?.avatar_url ?? null}
         isAdmin={profile?.is_admin ?? false}
-        groups={groups}
         logoutAction={logout}
       />
       <main className="flex-1 min-w-0 bg-surface-2">{children}</main>
