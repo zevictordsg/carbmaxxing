@@ -21,7 +21,7 @@ export function HeroBanner({
   const hasVideo = Boolean(videoUrl);
 
   return (
-    <section className="relative h-[380px] w-full overflow-hidden sm:h-[460px] md:h-[560px] lg:h-[620px]">
+    <section className="relative h-[440px] w-full overflow-hidden sm:h-[560px] md:h-[680px] lg:h-[760px]">
       <Image
         src={thumbnailUrl || "/images/landing/desktop-hero.webp"}
         alt=""
@@ -29,10 +29,17 @@ export function HeroBanner({
         priority
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-surface-2 via-black/40 to-black/10" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/10 to-transparent" />
+      {/* General darken across the whole photo, strongest low and on the
+          left, so the title stays legible over busy parts of the image. */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/5" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/15 to-transparent" />
+      {/* Tall, dedicated fade into the page background -- this is what
+          makes the hero bleed seamlessly into the rest of the members
+          area instead of cutting off at a hard edge. Ends in the exact
+          page color (surface-2), so there's no visible seam. */}
+      <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-surface-2 via-surface-2/70 to-transparent" />
 
-      <div className="relative z-10 flex h-full flex-col justify-end px-6 pb-10 sm:pb-14 md:px-10">
+      <div className="relative z-10 flex h-full flex-col justify-end px-6 pb-20 sm:pb-24 md:px-10 md:pb-28">
         {creatorName && (
           <p className="label-loose text-[10px] text-white/60 mb-3">{creatorName}</p>
         )}

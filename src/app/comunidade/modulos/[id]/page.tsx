@@ -53,7 +53,8 @@ export default async function ModulePage({
             <img src={module.cover_url} alt="" className="absolute inset-0 h-full w-full object-cover" />
           )}
         </CoverPlaceholder>
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-2 via-black/30 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/5" />
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-surface-2 via-surface-2/70 to-transparent" />
         <div className="relative z-10 flex h-full flex-col justify-end px-6 pb-8 md:px-10">
           <h1 className="heading-tight text-3xl text-white sm:text-4xl md:text-5xl">
             {module.title}

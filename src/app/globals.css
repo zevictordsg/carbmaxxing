@@ -6,10 +6,10 @@
   --muted: #8a8a8a;
   --muted-dim: #5c5c5c;
   --surface: #0a0a0a;
-  /* Slightly richer than --surface -- used for the comunidade chat/content
-     pane so it reads as a distinct dark layer (Discord-style depth)
-     instead of flat pure black. */
-  --surface-2: #111113;
+  /* Near-black, matching --surface -- the members area reads as one
+     continuous dark plane (Netflix-style) rather than a lighter "panel"
+     sitting on top of the rest of the site. */
+  --surface-2: #08080a;
   --surface-3: #17171a;
   --border-subtle: #1f1f1f;
 }
