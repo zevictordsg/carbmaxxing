@@ -46,7 +46,7 @@ export default async function ModulePage({
 
   return (
     <div className="flex flex-col">
-      <section className="relative h-[220px] w-full overflow-hidden sm:h-[280px] md:h-[320px]">
+      <section className="relative -mt-16 h-[220px] w-full overflow-hidden sm:h-[280px] md:h-[320px]">
         <CoverPlaceholder className="h-full w-full">
           {module.cover_url && (
             // eslint-disable-next-line @next/next/no-img-element

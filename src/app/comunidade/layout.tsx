@@ -28,7 +28,10 @@ export default async function ComunidadeLayout({
         isAdmin={profile?.is_admin ?? false}
         logoutAction={logout}
       />
-      <main className="flex-1 min-w-0 bg-surface-2">{children}</main>
+      {/* pt-16 reserves room for the fixed TopBar on pages without a hero
+          image behind it; hero sections cancel this with -mt-16 so their
+          photo still reaches the true top of the viewport. */}
+      <main className="flex-1 min-w-0 bg-surface-2 pt-16">{children}</main>
     </div>
   );
 }

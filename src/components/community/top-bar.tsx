@@ -11,8 +11,13 @@ function initials(name: string): string {
  * Slim top bar for the members area -- logo on the left, profile/admin/exit
  * on the right. Replaces the old channel sidebar entirely: there's no
  * longer a list of chat channels to navigate, just the member's own
- * shortcuts. Modeled after Netflix's top nav (logo + a couple of icons),
- * not a full nav bar, since there's nothing left to list.
+ * shortcuts. `fixed` + a transparent-to-nothing gradient (not a solid bar)
+ * so it floats directly over the hero image instead of pushing it down --
+ * the Netflix/Balaclava treatment, logo overlaid on the photo itself.
+ * layout.tsx reserves matching top padding on <main> for pages that don't
+ * have a hero image behind the bar; hero sections cancel that padding
+ * with a negative margin so the photo still starts at the true viewport
+ * top.
  */
 export function TopBar({
   displayName,
@@ -26,7 +31,7 @@ export function TopBar({
   logoutAction: () => void;
 }) {
   return (
-    <header className="sticky top-0 z-30 flex items-center justify-between border-b border-border-subtle bg-surface/90 px-4 py-3 backdrop-blur-sm md:px-8">
+    <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between bg-gradient-to-b from-black/70 via-black/30 to-transparent px-4 py-3 md:px-8">
       <Link href="/comunidade" className="heading-tight-2 text-base text-white shrink-0">
         Carbmaxxing<span className="align-super text-[9px]">®</span>
       </Link>

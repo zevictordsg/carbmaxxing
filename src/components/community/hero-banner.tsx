@@ -21,12 +21,14 @@ export function HeroBanner({
   const hasVideo = Boolean(videoUrl);
 
   return (
-    <section className="relative h-[440px] w-full overflow-hidden sm:h-[560px] md:h-[680px] lg:h-[760px]">
+    <section className="relative -mt-16 h-[440px] w-full overflow-hidden sm:h-[560px] md:h-[680px] lg:h-[760px]">
       <Image
         src={thumbnailUrl || "/images/landing/desktop-hero.webp"}
         alt=""
         fill
         priority
+        quality={95}
+        sizes="100vw"
         className="object-cover"
       />
       {/* General darken across the whole photo, strongest low and on the
