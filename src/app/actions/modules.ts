@@ -13,6 +13,10 @@ const CreateModuleSchema = z.object({
   coverUrl: z.string().trim().max(2000, "Link muito longo.").optional().or(z.literal("")),
   isLocked: z.boolean(),
   hideCaption: z.boolean(),
+  // Qual produto (ver 0013_product_access.sql) libera este módulo quando
+  // travado -- "" vira null (sem produto == nenhuma assinatura libera,
+  // fica só pra admin, igual sempre foi). Só importa quando isLocked=true.
+  requiredProduct: z.enum(["", "pdf", "calculadora"]).optional(),
 });
 
 export type CreateModuleState = { error?: string } | undefined;
@@ -32,6 +36,7 @@ export async function createModule(
     coverUrl: formData.get("coverUrl") || "",
     isLocked: formData.get("isLocked") === "on",
     hideCaption: formData.get("hideCaption") === "on",
+    requiredProduct: formData.get("requiredProduct") || "",
   });
 
   if (!parsed.success) {
@@ -58,6 +63,7 @@ export async function createModule(
     cover_url: parsed.data.coverUrl || null,
     is_locked: parsed.data.isLocked,
     hide_caption: parsed.data.hideCaption,
+    required_product: parsed.data.requiredProduct || null,
     order: nextOrder,
   });
 

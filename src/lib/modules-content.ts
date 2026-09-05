@@ -7,10 +7,12 @@
  * array. `id` doubles as the URL slug (/comunidade/modulos/<id>), so keep
  * it short, lowercase, hyphenated, and stable once shared/linked anywhere.
  *
- * `isLocked` still gates for real: a locked module's lessons are hidden
- * from anyone without has_content_access() (admin, or an active
- * subscription once Stripe is wired back up) -- see
- * src/app/comunidade/modulos/[id]/page.tsx.
+ * `isLocked` still gates for real: a locked module's lessons/tool are
+ * hidden from anyone without access to `requiredProduct` (checked via
+ * has_product_access(product), 0014_product_access_generic.sql -- admin,
+ * or an active `subscriptions` row for that exact product) -- see
+ * src/app/comunidade/modulos/[id]/page.tsx. Defaults to 'calculadora' when
+ * omitted, for backward compatibility with modules that predate this field.
  */
 
 export type Lesson = {
@@ -29,7 +31,17 @@ export type Module = {
   /** true: card shows just the cover art, no [Módulo] tag/title overlay. */
   hideCaption?: boolean;
   isLocked: boolean;
+  /** Qual produto libera este módulo quando isLocked=true (ver has_product_access). Default: 'calculadora'. */
+  requiredProduct?: "pdf" | "calculadora";
   lessons: Lesson[];
+  /**
+   * Quando setado, a página do módulo mostra um botão "Baixar PDF" (link
+   * com `download`, mesma origem -- ver src/app/comunidade/modulos/[id]/page.tsx)
+   * em vez da lista de aulas. Caminho relativo dentro de `public/`
+   * (ex: "/files/como-montar-sua-dieta.pdf") ou URL completa.
+   */
+  downloadUrl?: string;
+  downloadLabel?: string;
   /**
    * When set, the module's page renders this interactive tool instead of
    * the Aulas/lesson list -- see src/components/community/carb-calculator.tsx
@@ -40,20 +52,26 @@ export type Module = {
 
 export const MODULES: Module[] = [
   {
-    id: "modulo-1",
-    title: "Módulo 1",
-    coverUrl: "/images/landing/calculadora-tool-hero.webp",
-    hideCaption: true,
-    isLocked: false,
+    id: "pdf-dieta",
+    title: "PDF Como Montar Sua Dieta",
+    coverUrl: "/images/landing/pdf-grayscale.png",
+    isLocked: true,
+    requiredProduct: "pdf",
     lessons: [],
-    customTool: "carb-calculator",
+    // Coloque o PDF de verdade em public/files/como-montar-sua-dieta.pdf
+    // (crie a pasta public/files/ se ainda não existir) -- o link abaixo já
+    // aponta pra lá.
+    downloadUrl: "/files/como-montar-sua-dieta.pdf",
+    downloadLabel: "Baixar PDF — Como Montar Sua Dieta",
   },
   {
-    id: "modulo-2",
-    title: "Módulo 2",
-    coverUrl: "/images/landing/modulo1.webp",
+    id: "calculadora",
+    title: "Calculadora",
+    coverUrl: "/images/landing/calculadora-tool-hero.webp",
     hideCaption: true,
     isLocked: true,
+    requiredProduct: "calculadora",
     lessons: [],
+    customTool: "carb-calculator",
   },
 ];

@@ -64,6 +64,18 @@ export function ModuleForm() {
           />
           Conteúdo travado (só assinantes/admin)
         </label>
+        <label className="flex flex-col gap-1 text-sm text-muted select-none">
+          Produto que libera este módulo (só importa se estiver travado)
+          <select
+            name="requiredProduct"
+            defaultValue=""
+            className="w-full rounded-md bg-surface-3 border border-border-subtle text-white text-sm px-4 py-2.5 outline-none focus:border-white/25 transition-colors"
+          >
+            <option value="">Nenhum (só admin)</option>
+            <option value="pdf">PDF (grátis)</option>
+            <option value="calculadora">Calculadora (comprado)</option>
+          </select>
+        </label>
         <label className="flex items-center gap-2 text-sm text-muted select-none">
           <input
             type="checkbox"

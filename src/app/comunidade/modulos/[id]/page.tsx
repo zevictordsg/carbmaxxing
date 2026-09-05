@@ -10,10 +10,12 @@ import { MODULES } from "@/lib/modules-content";
  * (lessons) as a simple list. Module + lesson content comes from
  * src/lib/modules-content.ts (hand-edited in code), not the `modules`/
  * `lessons` Supabase tables. Access is still real, though: a locked
- * module's lessons stay hidden from anyone without has_content_access()
- * (admin, or an active subscription once Stripe is wired back up) --
- * notFound() covers both "no such module" and "exists but you can't see
- * it" with the same shape, so nothing about access leaks through the 404.
+ * module's lessons/tool stay hidden from anyone without
+ * has_product_access(requiredProduct) (admin, or an active subscription
+ * for that exact product -- 'calculadora' by default when the module
+ * doesn't set requiredProduct) -- notFound() covers both "no such module"
+ * and "exists but you can't see it" with the same shape, so nothing about
+ * access leaks through the 404.
  */
 export default async function ModulePage({
   params,
@@ -31,7 +33,9 @@ export default async function ModulePage({
   if (!contentModule) notFound();
 
   if (contentModule.isLocked) {
-    const { data: hasAccess } = await supabase.rpc("has_content_access");
+    const { data: hasAccess } = await supabase.rpc("has_product_access", {
+      p_product: contentModule.requiredProduct ?? "calculadora",
+    });
     if (!hasAccess) notFound();
   }
 
@@ -62,6 +66,22 @@ export default async function ModulePage({
         <div id="carb-calc-print-wrap" className="px-6 py-10 md:px-10 md:py-12">
           <div className="mx-auto max-w-4xl">
             <CarbCalculator />
+          </div>
+        </div>
+      ) : contentModule.downloadUrl ? (
+        <div className="px-6 py-10 md:px-10 md:py-12">
+          <div className="max-w-2xl">
+            {/* `download` só força o download direto (em vez de abrir numa
+                aba) pra link do mesmo domínio -- por isso o arquivo mora em
+                public/ deste projeto, não num link externo. */}
+            <a
+              href={contentModule.downloadUrl}
+              download
+              className="inline-flex items-center gap-2 rounded-md bg-amber-400 px-5 py-3 text-sm font-semibold text-black transition-colors hover:bg-amber-300"
+            >
+              <span aria-hidden>⬇️</span>
+              {contentModule.downloadLabel ?? "Baixar arquivo"}
+            </a>
           </div>
         </div>
       ) : (
