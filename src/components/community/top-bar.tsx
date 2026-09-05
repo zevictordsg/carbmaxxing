@@ -31,7 +31,7 @@ export function TopBar({
   logoutAction: () => void;
 }) {
   return (
-    <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between bg-gradient-to-b from-black/70 via-black/30 to-transparent px-4 py-3 md:px-8">
+    <header className="fixed inset-x-0 top-0 z-30 flex items-center justify-between bg-gradient-to-b from-black/70 via-black/30 to-transparent px-4 py-3 md:px-8 print:hidden">
       <Link href="/comunidade" className="heading-tight-2 text-base text-white shrink-0">
         Carbmaxxing<span className="align-super text-[9px]">®</span>
       </Link>

@@ -7,8 +7,12 @@ import { createClient } from "@/lib/supabase/server";
 const CreateModuleSchema = z.object({
   title: z.string().trim().min(3, "Dê um título pro módulo.").max(120, "Título muito longo."),
   description: z.string().trim().max(300, "Descrição muito longa.").optional(),
-  coverUrl: z.string().trim().url("Cole um link de imagem válido.").optional().or(z.literal("")),
+  // Accepts a full URL or a relative /public path (e.g. /images/landing/foo.png)
+  // -- both resolve fine in an <img src>, and a relative path works the same
+  // locally and once deployed, so it doesn't have to be an absolute URL.
+  coverUrl: z.string().trim().max(2000, "Link muito longo.").optional().or(z.literal("")),
   isLocked: z.boolean(),
+  hideCaption: z.boolean(),
 });
 
 export type CreateModuleState = { error?: string } | undefined;
@@ -27,6 +31,7 @@ export async function createModule(
     description: formData.get("description") || undefined,
     coverUrl: formData.get("coverUrl") || "",
     isLocked: formData.get("isLocked") === "on",
+    hideCaption: formData.get("hideCaption") === "on",
   });
 
   if (!parsed.success) {
@@ -52,6 +57,7 @@ export async function createModule(
     description: parsed.data.description ?? null,
     cover_url: parsed.data.coverUrl || null,
     is_locked: parsed.data.isLocked,
+    hide_caption: parsed.data.hideCaption,
     order: nextOrder,
   });
 

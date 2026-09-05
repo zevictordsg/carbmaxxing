@@ -1,16 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { HeroBanner } from "@/components/community/hero-banner";
 import { ModuleCard } from "@/components/community/module-card";
-import { ModuleForm } from "@/components/community/module-form";
-import { FeaturedVideoForm } from "@/components/community/featured-video-form";
 import { ContentCard } from "@/components/community/content-card";
-
-type ModuleRow = {
-  id: string;
-  title: string;
-  is_locked: boolean;
-  cover_url: string | null;
-};
+import { MODULES } from "@/lib/modules-content";
 
 type FeaturedVideo = {
   id: string;
@@ -27,6 +19,15 @@ type FeaturedVideo = {
  * legacy chat channels and content_items carousel are no longer linked
  * from here (see AGENTS.md-adjacent notes in layout.tsx / sidebar.tsx --
  * that code still exists, just isn't part of the members-area nav anymore).
+ *
+ * Modules themselves come from src/lib/modules-content.ts, hand-edited in
+ * code, not from the `modules` Supabase table / admin form (that DB table
+ * + the ModuleForm UI are still there, just no longer wired up here --
+ * same "leave it, just unlink it" treatment as the old sidebar). The
+ * "Publicar vídeo em destaque" admin form got the same treatment: removed
+ * from this page (FeaturedVideoForm/featured-video-form.tsx still exists,
+ * just unused) -- the hero still reads the latest featured_videos row if
+ * one's already there, it just can't be published from here anymore.
  */
 export default async function ComunidadePage() {
   const supabase = await createClient();
@@ -35,28 +36,13 @@ export default async function ComunidadePage() {
   } = await supabase.auth.getUser();
   if (!user) return null; // layout.tsx already redirects
 
-  const [{ data: profile }, { data: rawModules }, { data: rawVideos }] = await Promise.all([
-    supabase.from("profiles").select("is_admin").eq("id", user.id).single(),
-    supabase
-      .from("modules")
-      .select("id, title, is_locked, cover_url")
-      .order("order", { ascending: true }),
-    supabase
-      .from("featured_videos")
-      .select("id, title, video_url, thumbnail_url, creator_name")
-      .order("created_at", { ascending: false })
-      .limit(1),
-  ]);
+  const { data: rawVideos } = await supabase
+    .from("featured_videos")
+    .select("id, title, video_url, thumbnail_url, creator_name")
+    .order("created_at", { ascending: false })
+    .limit(1);
 
-  const isAdmin = profile?.is_admin ?? false;
-  const modules: ModuleRow[] = rawModules ?? [];
   const featuredVideo: FeaturedVideo | null = rawVideos?.[0] ?? null;
-
-  let hiddenLockedCount = 0;
-  if (!isAdmin) {
-    const { data: lockedCount } = await supabase.rpc("count_locked_modules");
-    hiddenLockedCount = lockedCount ?? 0;
-  }
 
   return (
     <div className="flex flex-col">
@@ -67,51 +53,25 @@ export default async function ComunidadePage() {
         creatorName={featuredVideo?.creator_name ?? null}
       />
 
-      {isAdmin && (
-        <div className="px-6 pt-8 md:px-10">
-          <div className="max-w-xl">
-            <FeaturedVideoForm />
-          </div>
-        </div>
-      )}
-
       <div id="modulos" className="px-6 py-10 md:px-10 md:py-12 scroll-mt-16">
-        <div className="mb-6 flex items-baseline justify-between">
-          <h2 className="heading-tight-2 text-xl text-white flex items-center gap-2 md:text-2xl">
-            <span aria-hidden>📚</span> Módulos
-          </h2>
-        </div>
+        <p className="mb-6 text-sm font-semibold text-white sm:text-base">
+          Meus conteúdos:
+        </p>
 
-        {isAdmin && (
-          <div className="mb-8 max-w-xl">
-            <ModuleForm />
+        {MODULES.length === 0 ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            <ContentCard categoryLabel="Módulo" title="Em breve" isLocked size="large" />
           </div>
-        )}
-
-        {modules.length === 0 && hiddenLockedCount === 0 ? (
-          <p className="text-sm text-muted-dim">
-            {isAdmin
-              ? "Nenhum módulo ainda -- crie o primeiro acima."
-              : "Nenhum módulo disponível por enquanto."}
-          </p>
         ) : (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {modules.map((module) => (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {MODULES.map((module) => (
               <ModuleCard
                 key={module.id}
                 id={module.id}
                 title={module.title}
-                isLocked={module.is_locked}
-                coverUrl={module.cover_url}
-                canDelete={isAdmin}
-              />
-            ))}
-            {Array.from({ length: hiddenLockedCount }).map((_, i) => (
-              <ContentCard
-                key={`locked-${i}`}
-                categoryLabel="Módulo"
-                title="Conteúdo exclusivo"
-                isLocked
+                isLocked={module.isLocked}
+                coverUrl={module.coverUrl ?? null}
+                hideCaption={module.hideCaption}
               />
             ))}
           </div>

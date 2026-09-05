@@ -1,0 +1,1246 @@
+/*
+ * Styling for the "Protocolo Carbmaxxing" calculator (carb-calculator.tsx).
+ * Reskinned onto the app's own tokens (--surface/-2/-3, --border-subtle,
+ * --muted, --muted-dim from globals.css) instead of the tool's original
+ * standalone palette+serif -- so it reads as part of Carbmaxxing, not a
+ * pasted-in artifact. Structural cues (numbered steps, bracket labels,
+ * uppercase tracked micro-copy, generous section spacing) follow the same
+ * "Balaclava-style editorial voice" globals.css already names for
+ * .heading-tight/.label-loose.
+ */
+
+/* ---- glass surfaces --------------------------------------------------
+ * .toolwrap holds a couple of large, softly drifting blurred color blobs
+ * behind everything (z-index 0) so .frame's backdrop-filter has something
+ * to actually frost -- over a flat background, backdrop-blur is a no-op.
+ * Cards inside stay lightly translucent (no blur of their own -- stacking
+ * blurs gets expensive and muddy) so they read as glass sitting on glass.
+ */
+.toolwrap {
+  position: relative;
+  isolation: isolate;
+}
+.blob {
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  opacity: 0.4;
+}
+.blob1 {
+  width: 320px;
+  height: 320px;
+  top: 40px;
+  left: -80px;
+  background: radial-gradient(circle, rgba(245, 243, 238, 0.32), transparent 70%);
+  animation: blob-drift-1 26s ease-in-out infinite;
+}
+.blob2 {
+  width: 300px;
+  height: 300px;
+  bottom: -40px;
+  right: -70px;
+  background: radial-gradient(circle, rgba(181, 88, 63, 0.2), transparent 70%);
+  animation: blob-drift-2 32s ease-in-out infinite;
+}
+@keyframes blob-drift-1 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(30px, 24px) scale(1.08);
+  }
+}
+@keyframes blob-drift-2 {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-26px, -20px) scale(1.06);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .blob1,
+  .blob2 {
+    animation: none;
+  }
+}
+
+.frame {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(175deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 40px 80px -40px rgba(0, 0, 0, 0.7);
+}
+@media (max-width: 640px) {
+  .frame {
+    padding: 22px 16px;
+    border-radius: 18px;
+  }
+}
+
+.toolhead {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 32px;
+}
+.toolhead p {
+  margin: 10px 0 0;
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.stepsnav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 36px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 22px;
+}
+.steppill {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 2px;
+  border: none;
+  background: transparent;
+  color: var(--muted-dim);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+.steppill:not(:last-child)::after {
+  content: "";
+  width: 24px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.16);
+  margin: 0 10px;
+}
+.steppill:hover {
+  color: var(--muted);
+}
+.num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted-dim);
+  flex-shrink: 0;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+.isActive {
+  color: var(--foreground);
+}
+.isActive .num {
+  background: var(--foreground);
+  border-color: var(--foreground);
+  color: var(--background);
+}
+.isDone .num {
+  border-color: var(--muted);
+  color: var(--muted);
+}
+.isDone {
+  color: var(--muted);
+}
+
+.stepHead {
+  margin-bottom: 30px;
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+.stepBignum {
+  font-size: 56px;
+  line-height: 0.9;
+  color: var(--foreground);
+  opacity: 0.1;
+  flex-shrink: 0;
+  margin-top: -4px;
+}
+@media (max-width: 640px) {
+  .stepBignum {
+    display: none;
+  }
+}
+.stepEyebrow {
+  font-size: 11px;
+  color: var(--muted-dim);
+  margin-bottom: 10px;
+}
+.stepTitle {
+  font-size: clamp(22px, 3vw, 30px);
+  margin: 0 0 8px;
+}
+.stepHint {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  gap: 18px;
+}
+.grid2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.grid3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+@media (max-width: 760px) {
+  .grid2,
+  .grid3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.field label {
+  font-size: 11.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.field input[type="text"],
+.field input[type="number"],
+.field input[type="time"],
+.field select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  color: var(--foreground);
+  font-size: 15px;
+  padding: 11px 13px;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.field input[type="text"]:hover,
+.field input[type="number"]:hover,
+.field input[type="time"]:hover,
+.field select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.field select {
+  font-family: inherit;
+}
+.field input:focus-visible,
+.field select:focus-visible,
+.btn:focus-visible,
+.toggleBtn:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+.unit {
+  color: var(--muted-dim);
+  font-size: 11.5px;
+}
+
+.toggleGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.toggleBtn {
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--muted);
+  font-size: 13.5px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background 0.15s ease;
+}
+.toggleBtn:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.toggleBtnOn {
+  border-color: var(--foreground);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--foreground);
+}
+.day {
+  width: 42px;
+  height: 38px;
+  padding: 0;
+  text-align: center;
+  font-size: 11.5px;
+}
+
+.rangeWrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.rangeWrap input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
+}
+.rangeWrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--foreground);
+  cursor: pointer;
+  border: 3px solid var(--surface-3);
+}
+.rangeWrap input[type="range"]::-moz-range-thumb {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--foreground);
+  cursor: pointer;
+  border: none;
+}
+.rangeValue {
+  font-size: 14.5px;
+  min-width: 56px;
+  text-align: right;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 17px 18px;
+}
+.cardSelect {
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+.cardSelect:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.cardSelectOn {
+  border-color: var(--foreground);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.listRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 12px 14px;
+  flex-wrap: wrap;
+}
+.grow {
+  flex: 1 1 180px;
+}
+.days {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.days button {
+  width: 30px;
+  height: 30px;
+  font-size: 10px;
+  padding: 0;
+}
+.iconBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--muted-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.iconBtn:hover {
+  border-color: #b5583f;
+  color: #d97757;
+}
+
+.addRowBtn {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  color: var(--muted);
+  border-radius: 10px;
+  padding: 10px 15px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.addRowBtn:hover {
+  border-color: var(--foreground);
+  color: var(--foreground);
+}
+
+.foodgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 9px;
+}
+.foodChip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+}
+.foodChip:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.foodChipOn {
+  border-color: var(--foreground);
+  background: rgba(255, 255, 255, 0.08);
+}
+.fname {
+  font-size: 13px;
+  color: var(--foreground);
+}
+.ftag {
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.tagProteina {
+  background: rgba(183, 179, 168, 0.12);
+  color: #b7b3a8;
+}
+.tagCarboidrato {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--foreground);
+}
+.tagGordura {
+  background: rgba(77, 74, 68, 0.24);
+  color: #a8a49b;
+}
+.tagMisto {
+  background: rgba(240, 238, 231, 0.12);
+  color: #f0eee7;
+}
+
+.btn {
+  font-size: 14px;
+  padding: 11px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.btnPrimary {
+  background: var(--foreground);
+  color: var(--background);
+  font-weight: 600;
+}
+.btnPrimary:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+.btnPrimary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.btnGhost {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--muted);
+}
+.btnGhost:hover {
+  color: var(--foreground);
+  border-color: var(--muted);
+}
+
+.stepactions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.toolfoot {
+  position: relative;
+  z-index: 1;
+  margin-top: 28px;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.toolfoot p {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--muted-dim);
+  line-height: 1.6;
+  max-width: 720px;
+}
+
+.statTile {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 18px 18px 16px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.statTile:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+}
+.statLabel {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.statValue {
+  font-size: 32px;
+  font-variant-numeric: tabular-nums;
+}
+.statValue small {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+.statFoot {
+  font-size: 11.5px;
+  color: var(--muted-dim);
+  margin-top: 8px;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 34px 0 14px;
+}
+.sectionLabel::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+.sectionLabelFirst {
+  margin-top: 0;
+}
+
+.weekStrip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+.dayTile {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 13px 9px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.035);
+}
+.dayTileTraining {
+  border-color: var(--foreground);
+  background: rgba(255, 255, 255, 0.06);
+}
+.dayName {
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.dayDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f0eee7;
+  margin: 6px auto;
+}
+.dayDotRest {
+  background: #4d4a44;
+}
+.dayKcal {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.dayCarb {
+  font-size: 10.5px;
+  color: var(--foreground);
+  margin-top: 3px;
+}
+.dayFreeTag {
+  font-size: 9px;
+  color: var(--muted-dim);
+  margin-top: 5px;
+  letter-spacing: 0.02em;
+}
+@media (max-width: 760px) {
+  .weekStrip {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.macroBar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface);
+  overflow: hidden;
+  display: flex;
+  margin-top: 14px;
+  border: 1px solid var(--border-subtle);
+}
+.macroBar span {
+  height: 100%;
+}
+
+.timelineWrap {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 78px 20px 16px;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+.timelineTrack {
+  position: relative;
+  height: 62px;
+  min-width: 620px;
+  border-radius: 9px;
+  background: rgba(77, 74, 68, 0.2);
+  overflow: visible;
+}
+.tlZone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: 7px;
+}
+.tlZoneLabel {
+  position: absolute;
+  top: -22px;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--muted);
+}
+.tlAxis {
+  position: relative;
+  height: 18px;
+  min-width: 620px;
+  margin-top: 6px;
+}
+.tlTick {
+  position: absolute;
+  top: 0;
+  font-size: 10px;
+  color: var(--muted-dim);
+  transform: translateX(-50%);
+}
+.tlMeal {
+  position: absolute;
+  bottom: 100%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+.tlMealPin {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--surface);
+}
+.tlMealLabel {
+  font-size: 10px;
+  background: var(--surface-3);
+  border: 1px solid var(--border-subtle);
+  padding: 3px 7px;
+  border-radius: 999px;
+  white-space: nowrap;
+  color: var(--foreground);
+}
+.tlMealRisco .tlMealLabel {
+  border-color: #b5583f;
+  color: #e0876f;
+}
+
+.legendGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.legendDot {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.zoneCard {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 17px 18px;
+  background: rgba(255, 255, 255, 0.035);
+  margin-bottom: 12px;
+}
+.zoneCardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.zoneBadge {
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.zoneTime {
+  font-size: 11.5px;
+  color: var(--muted-dim);
+}
+.zoneRec {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 6px 0 12px;
+}
+.suggestionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 13px;
+}
+.suggestionRowFirst {
+  border-top: none;
+}
+.suggestionFood {
+  color: var(--foreground);
+}
+.suggestionQty {
+  color: var(--foreground);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.emptyNote {
+  font-size: 12px;
+  color: var(--muted-dim);
+  font-style: italic;
+  padding: 8px 0;
+}
+
+.disclaimerCard {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 19px 20px;
+  background: rgba(255, 255, 255, 0.035);
+}
+.disclaimerCard p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin: 0 0 10px;
+}
+.disclaimerCard p:last-child {
+  margin-bottom: 0;
+}
+.sources {
+  letter-spacing: 0.01em;
+  color: var(--muted-dim);
+}
+
+.methodNote {
+  font-size: 11.5px;
+  color: var(--muted-dim);
+  line-height: 1.6;
+  border-left: 2px solid rgba(255, 255, 255, 0.14);
+  padding-left: 12px;
+  margin-top: 16px;
+}
+
+.printOnly {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toggleBtn,
+  .foodChip,
+  .steppill,
+  .btn {
+    transition:
+      border-color 0.15s ease,
+      color 0.15s ease,
+      background 0.15s ease;
+  }
+}
+
+/* ---- print / PDF export ------------------------------------------------
+ * "Baixar PDF" is just window.print() -- this block IS the PDF's design.
+ * Kept the black background on purpose (that's the ask): forcing it here
+ * because most browsers default print to a white page and drop background
+ * colors unless explicitly told to keep them. Everything translucent
+ * (the glass cards) gets swapped for solid, higher-contrast fills here --
+ * glass-on-a-screen reads fine, glass-in-a-PDF-viewer often doesn't.
+ */
+@media print {
+  :global(html),
+  :global(body) {
+    background: #08080a !important;
+  }
+  :global(*) {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Zero page margins -- every .printPage below owns its own internal
+   * padding instead, so whitespace is deliberate per-section rather than
+   * a fixed browser gutter eating into a full-bleed dark cover. */
+  @page {
+    margin: 0;
+  }
+
+  .noPrint {
+    display: none !important;
+  }
+  .printOnly {
+    display: block;
+  }
+  .blob1,
+  .blob2 {
+    display: none;
+  }
+
+  .frame {
+    position: static;
+    background: #08080a !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+  .toolwrap {
+    background: #08080a;
+  }
+  /* The module page wraps <CarbCalculator/> in its own padded/max-width
+   * container (src/app/comunidade/modulos/[id]/page.tsx) -- fine on
+   * screen, but it would otherwise add a permanent extra inset on top of
+   * .printPage's own margins on every printed page. Print gets to use the
+   * full page width; .printPage owns all the internal breathing room. */
+  :global(#carb-calc-print-wrap),
+  :global(#carb-calc-print-wrap > div) {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+  }
+
+  .toolhead,
+  .stepsnav,
+  .stepHead {
+    display: none !important;
+  }
+
+  /* ==== printed report -----------------------------------------------
+   * The on-screen glass cards, timeline and week strip are all .noPrint --
+   * printing them 1:1 was just a screenshot of the app, not a document.
+   * Everything below is the actual PDF content, built as its own set of
+   * full-bleed pages (cover / resumo / linha do tempo / refeições /
+   * disclaimer) instead of a captured screenshot -- dark background,
+   * bold monochrome headings, color reserved for the emoji/icon accents.
+   */
+  .printPage {
+    break-before: page;
+    min-height: 297mm;
+    box-sizing: border-box;
+    padding: 22mm 18mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .printPage:first-child {
+    break-before: avoid;
+  }
+
+  .printEyebrow {
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted-dim);
+    margin-bottom: 10mm;
+  }
+  .printPageTitle {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+    margin-bottom: 4mm;
+    break-after: avoid;
+  }
+  .printPageHint {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 12mm;
+    max-width: 130mm;
+  }
+
+  /* ---- cover ---------------------------------------------------------- */
+  .printCover {
+    justify-content: space-between;
+    background: #08080a;
+  }
+  .printCoverTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .printCoverMark {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-dim);
+  }
+  .printCoverDate {
+    font-size: 11px;
+    color: var(--muted-dim);
+  }
+  .printCoverMid {
+    margin: auto 0;
+  }
+  .printCoverEyebrow {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8mm;
+  }
+  .printCoverTitle {
+    font-size: 44px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    color: var(--foreground);
+    margin-bottom: 6mm;
+  }
+  .printCoverClient {
+    font-size: 16px;
+    color: var(--muted);
+  }
+  .printCoverFoot {
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    padding-top: 8mm;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6mm;
+  }
+  .printCoverFootItem {
+    font-size: 9.5px;
+    color: var(--muted-dim);
+  }
+  .printCoverFootItem strong {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--foreground);
+    margin-bottom: 1.5mm;
+  }
+
+  /* ---- stat grid (resumo do dia) --------------------------------------- */
+  .printStatGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8mm;
+    margin-bottom: 12mm;
+  }
+  .printStatCard {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 3px;
+    padding: 6mm 6mm 5mm;
+    break-inside: avoid;
+  }
+  .printStatLabel {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-dim);
+    margin-bottom: 3mm;
+  }
+  .printStatValue {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--foreground);
+  }
+  .printStatValue small {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-left: 2px;
+  }
+  .printStatFoot {
+    font-size: 9px;
+    color: var(--muted-dim);
+    margin-top: 2mm;
+    line-height: 1.4;
+  }
+
+  .printMiniTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 14mm;
+    font-size: 9.5px;
+  }
+  .printMiniTable caption {
+    caption-side: top;
+    text-align: left;
+  }
+  .printMiniTable th,
+  .printMiniTable td {
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 4.5px 6px 4.5px 0;
+    text-align: left;
+    color: var(--foreground);
+  }
+  .printMiniTable thead th {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted-dim);
+    font-weight: 600;
+  }
+  .printMiniTable td:last-child,
+  .printMiniTable th:last-child {
+    text-align: right;
+  }
+  .printTrTraining td:first-child {
+    font-weight: 700;
+  }
+
+  /* ---- timeline --------------------------------------------------------- */
+  .printTlTrack {
+    position: relative;
+    height: 40mm;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+    margin-bottom: 6mm;
+  }
+  .printTlZone {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+  }
+  .printTlZoneLabel {
+    position: absolute;
+    font-size: 7px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    left: 1.5mm;
+  }
+  .printTlMeal {
+    position: absolute;
+    bottom: -1px;
+    transform: translateX(-50%);
+  }
+  .printTlMealDot {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2.6mm;
+    height: 2.6mm;
+    border-radius: 50%;
+    background: var(--foreground);
+  }
+  .printTlMealLabel {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 7.5px;
+    color: var(--foreground);
+    white-space: nowrap;
+  }
+  .printTlAxis {
+    position: relative;
+    height: 6mm;
+    margin-bottom: 10mm;
+  }
+  .printTlTick {
+    position: absolute;
+    font-size: 7.5px;
+    color: var(--muted-dim);
+    transform: translateX(-50%);
+  }
+  .printLegend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4mm 7mm;
+  }
+  .printLegendItem {
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+    font-size: 8.5px;
+    color: var(--muted);
+  }
+  .printLegendDot {
+    width: 2.2mm;
+    height: 2.2mm;
+    border-radius: 50%;
+    flex: none;
+  }
+
+  /* ---- per-meal blocks --------------------------------------------------- */
+  .printMealCard {
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    padding: 6mm 0;
+    break-inside: avoid;
+  }
+  .printMealCard:first-of-type {
+    border-top: none;
+    padding-top: 0;
+  }
+  .printMealHead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2.5mm;
+  }
+  .printMealName {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--foreground);
+  }
+  .printMealTime {
+    font-size: 10.5px;
+    color: var(--muted-dim);
+    font-weight: 400;
+    margin-left: 2mm;
+  }
+  .printMealTag {
+    font-size: 8.5px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 1.5mm 3mm;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .printMealRec {
+    font-size: 9.5px;
+    color: var(--muted-dim);
+    line-height: 1.55;
+    margin-bottom: 4mm;
+    max-width: 150mm;
+  }
+  .printMealItems {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6mm;
+  }
+  .printMealItem {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    color: var(--foreground);
+    padding: 1mm 0;
+  }
+  .printMealItemQty {
+    color: var(--muted);
+    white-space: nowrap;
+    margin-left: 6mm;
+  }
+  .printMealFoot {
+    margin-top: 3mm;
+    font-size: 9px;
+    color: var(--muted-dim);
+  }
+
+  /* ---- disclaimer page ---------------------------------------------------- */
+  .printDisclaimerPage .disclaimerCard {
+    background: transparent !important;
+    border: none !important;
+    padding: 0;
+    break-inside: avoid;
+  }
+  .printDisclaimerPage .disclaimerCard p {
+    font-size: 10.5px;
+    line-height: 1.7;
+    margin-bottom: 5mm;
+  }
+  .printTableNote {
+    font-size: 9.5px;
+    color: var(--muted-dim);
+    line-height: 1.5;
+    margin: 0;
+  }
+}

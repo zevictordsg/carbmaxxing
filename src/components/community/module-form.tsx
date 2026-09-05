@@ -49,9 +49,9 @@ export function ModuleForm() {
           className="w-full resize-none rounded-md bg-surface-3 border border-border-subtle text-white placeholder:text-muted-dim text-sm px-4 py-2.5 outline-none focus:border-white/25 transition-colors"
         />
         <input
-          type="url"
+          type="text"
           name="coverUrl"
-          placeholder="Link da capa (opcional -- pode adicionar depois)"
+          placeholder="Link da capa ou caminho local, ex: /images/landing/modulo1.png (opcional)"
           autoComplete="off"
           className="w-full rounded-md bg-surface-3 border border-border-subtle text-white placeholder:text-muted-dim text-sm px-4 py-2.5 outline-none focus:border-white/25 transition-colors"
         />
@@ -63,6 +63,14 @@ export function ModuleForm() {
             className="h-4 w-4 rounded border-border-subtle bg-surface-3 accent-amber-400"
           />
           Conteúdo travado (só assinantes/admin)
+        </label>
+        <label className="flex items-center gap-2 text-sm text-muted select-none">
+          <input
+            type="checkbox"
+            name="hideCaption"
+            className="h-4 w-4 rounded border-border-subtle bg-surface-3 accent-amber-400"
+          />
+          Mostrar só a capa (sem tag/título por cima -- pra quando a imagem já tem texto)
         </label>
         <div className="flex items-center justify-between gap-3">
           {state?.error ? (

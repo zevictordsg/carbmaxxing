@@ -7,34 +7,67 @@ function CardInner({
   title,
   isLocked,
   coverUrl,
+  size = "default",
+  hideCaption = false,
 }: {
   categoryLabel: string;
   title: string;
   isLocked: boolean;
   coverUrl?: string | null;
+  size?: "default" | "large";
+  hideCaption?: boolean;
 }) {
+  const large = size === "large";
+
   return (
-    <CoverPlaceholder className="aspect-[3/4] w-full rounded-xl">
+    <CoverPlaceholder
+      className={`${large ? "aspect-[9/16] rounded-2xl" : "aspect-[3/4] rounded-xl"} w-full transition-transform duration-300 ease-out group-hover:scale-[1.04]`}
+    >
       {coverUrl && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={coverUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={coverUrl}
+          alt=""
+          className={`absolute inset-0 h-full w-full object-cover ${isLocked ? "grayscale" : ""}`}
+        />
       )}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+
+      {/* hideCaption: pure cover art, no tag/title/darken -- used when the
+          image already carries its own text and an overlay would just
+          repeat or clash with it. */}
+      {!hideCaption && (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent" />
+          <div className={large ? "absolute bottom-0 left-0 right-0 p-4 sm:p-6" : "absolute bottom-0 left-0 right-0 p-3 sm:p-4"}>
+            <p
+              className={
+                large
+                  ? "label-loose text-[10px] text-white/60 sm:text-xs"
+                  : "label-loose text-[9px] text-white/60 sm:text-[10px]"
+              }
+            >
+              [{categoryLabel}]
+            </p>
+            <p
+              className={
+                large
+                  ? "heading-tight-2 text-xl text-white leading-tight mt-1 line-clamp-2 sm:text-2xl md:text-3xl"
+                  : "heading-tight-2 text-base text-white leading-tight mt-0.5 line-clamp-2 sm:text-lg"
+              }
+            >
+              {title}
+            </p>
+          </div>
+        </>
+      )}
 
       {isLocked && (
-        <div className="absolute top-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 backdrop-blur-sm">
-          <LockIcon className="h-3.5 w-3.5 text-white" />
+        <div
+          className={`absolute top-3 right-3 flex items-center justify-center rounded-full bg-black/70 backdrop-blur-sm ${large ? "h-9 w-9" : "h-8 w-8"}`}
+        >
+          <LockIcon className={large ? "h-4 w-4 text-white" : "h-3.5 w-3.5 text-white"} />
         </div>
       )}
-
-      <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
-        <p className="label-loose text-[9px] text-white/60 sm:text-[10px]">
-          [{categoryLabel}]
-        </p>
-        <p className="heading-tight-2 text-base text-white leading-tight mt-0.5 line-clamp-2 sm:text-lg">
-          {title}
-        </p>
-      </div>
     </CoverPlaceholder>
   );
 }
@@ -52,6 +85,8 @@ export function ContentCard({
   title,
   isLocked,
   coverUrl,
+  size = "default",
+  hideCaption = false,
   className = "",
 }: {
   href?: string;
@@ -59,19 +94,21 @@ export function ContentCard({
   title: string;
   isLocked: boolean;
   coverUrl?: string | null;
+  size?: "default" | "large";
+  hideCaption?: boolean;
   className?: string;
 }) {
   if (href) {
     return (
       <Link href={href} className={`group block ${className}`}>
-        <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} coverUrl={coverUrl} />
+        <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} coverUrl={coverUrl} size={size} hideCaption={hideCaption} />
       </Link>
     );
   }
 
   return (
-    <div className={className}>
-      <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} coverUrl={coverUrl} />
+    <div className={`group ${className}`}>
+      <CardInner categoryLabel={categoryLabel} title={title} isLocked={isLocked} coverUrl={coverUrl} size={size} hideCaption={hideCaption} />
     </div>
   );
 }

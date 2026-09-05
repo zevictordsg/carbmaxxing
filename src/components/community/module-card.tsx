@@ -15,6 +15,7 @@ export function ModuleCard({
   title,
   isLocked,
   coverUrl,
+  hideCaption = false,
   canDelete = false,
   className = "",
 }: {
@@ -22,6 +23,7 @@ export function ModuleCard({
   title: string;
   isLocked: boolean;
   coverUrl: string | null;
+  hideCaption?: boolean;
   canDelete?: boolean;
   className?: string;
 }) {
@@ -38,6 +40,8 @@ export function ModuleCard({
         title={title}
         isLocked={isLocked}
         coverUrl={coverUrl}
+        size="large"
+        hideCaption={hideCaption}
       />
       {canDelete && (
         <button
