@@ -54,7 +54,10 @@ export const MODULES: Module[] = [
   {
     id: "pdf-dieta",
     title: "PDF Como Montar Sua Dieta",
-    coverUrl: "/images/landing/pdf-grayscale.png",
+    // Capa colorida original -- o cinza/cadeado quando travado já é
+    // aplicado via CSS pelo ContentCard (`grayscale` quando isLocked),
+    // então não precisa de uma imagem pré-dessaturada separada.
+    coverUrl: "/images/landing/pdf.png",
     isLocked: true,
     requiredProduct: "pdf",
     lessons: [],

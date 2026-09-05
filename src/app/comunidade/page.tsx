@@ -44,6 +44,22 @@ export default async function ComunidadePage() {
 
   const featuredVideo: FeaturedVideo | null = rawVideos?.[0] ?? null;
 
+  // Grayscale/cadeado no card já é 100% CSS (ver ContentCard: `grayscale`
+  // + ícone só quando `isLocked=true`) -- só faltava esse `isLocked` vir do
+  // acesso real de quem está olhando, não do dado estático do módulo. Um
+  // módulo travado (isLocked=true no modules-content.ts) só continua
+  // "visualmente travado" pra quem NÃO tem o produto; quem tem, vê a capa
+  // colorida/sem cadeado, sem precisar de uma imagem separada pra isso.
+  const accessByModule = await Promise.all(
+    MODULES.map(async (module) => {
+      if (!module.isLocked) return true;
+      const { data: hasAccess } = await supabase.rpc("has_product_access", {
+        p_product: module.requiredProduct ?? "calculadora",
+      });
+      return Boolean(hasAccess);
+    })
+  );
+
   return (
     <div className="flex flex-col">
       <HeroBanner
@@ -64,12 +80,12 @@ export default async function ComunidadePage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {MODULES.map((module) => (
+            {MODULES.map((module, i) => (
               <ModuleCard
                 key={module.id}
                 id={module.id}
                 title={module.title}
-                isLocked={module.isLocked}
+                isLocked={module.isLocked && !accessByModule[i]}
                 coverUrl={module.coverUrl ?? null}
                 hideCaption={module.hideCaption}
               />
