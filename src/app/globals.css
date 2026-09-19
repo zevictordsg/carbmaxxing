@@ -95,3 +95,51 @@ body {
   display: none;
 }
 
+/* ──────────────────────────────────────────────────────────────────────
+   Área de membros — camada premium
+   ────────────────────────────────────────────────────────────────────── */
+
+/* Escada de entrada. Em vez de uma classe [animation-delay] arbitrária em
+   cada elemento, os filhos diretos de .stagger entram em sequência -- as
+   trilhas e as listas de aula têm contagem variável, então o atraso precisa
+   vir da posição, não de uma classe escrita à mão. */
+.stagger > * {
+  animation: fade-up 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.stagger > *:nth-child(3) { animation-delay: 0.14s; }
+.stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger > *:nth-child(5) { animation-delay: 0.26s; }
+.stagger > *:nth-child(6) { animation-delay: 0.32s; }
+.stagger > *:nth-child(7) { animation-delay: 0.38s; }
+.stagger > *:nth-child(n + 8) { animation-delay: 0.44s; }
+
+/* Grão sutil por cima das fotos grandes -- tira o aspecto "JPG chapado"
+   dos heros sem custo de imagem. */
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Máscaras laterais das trilhas: a última capa desaparece na borda em vez
+   de ser cortada em seco, sinalizando que ainda tem conteúdo pro lado. */
+/* Só na direita: a faixa começa em scroll 0, então a primeira capa nunca
+   precisa de fade -- e uma máscara nos dois lados apagava justamente a
+   borda esquerda do primeiro card. */
+.rail-mask {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger > * {
+    animation: none;
+  }
+}
+
